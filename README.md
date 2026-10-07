@@ -9,13 +9,6 @@
 
 ---
 
-## ⚡ Triết lý `low-cortisol`
-
-Khi đối mặt với segfault, memory leak hay race condition, người không nắm bản chất sẽ hoảng loạn và cortisol tăng vọt.  
-Một Systems Engineer thực thụ giữ cái đầu lạnh và cortisol ở mức thấp nhất—bởi vì mọi lỗi lầm trong máy tính đều có nguyên nhân gốc rễ và đều có thể đo lường, gỡ lỗi được bằng công cụ thích hợp.
-
----
-
 ## 🛠️ Công cụ sử dụng
 
 - **Ngôn ngữ:** C++
