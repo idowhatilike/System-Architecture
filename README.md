@@ -1,6 +1,6 @@
 # 🧊 low-cortisol
 
-> **"Learning the fundamentals today for a stronger engineering future."**
+> **"Learning basic but important concepts for the future ."**
 
 [![C++](https://img.shields.io/badge/Language-C%2B%2B-blue.svg?style=for-the-badge&logo=c%2B%2B)](https://en.cppreference.com/)
 [![CMake](https://img.shields.io/badge/Build-CMake-red.svg?style=for-the-badge&logo=cmake)](https://cmake.org/)
@@ -55,3 +55,4 @@ Một Systems Engineer thực thụ giữ cái đầu lạnh và cortisol ở m�
 | Ngày | Phase | Nội dung thực hiện | Trạng thái | Ghi chú |
 | :--- | :---: | :--- | :---: | :--- |
 | *YYYY-MM-DD* | Phase 1 | ... | In Progress | ... |
+
