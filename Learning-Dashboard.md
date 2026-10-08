@@ -1,159 +1,115 @@
-# Systems Engineering — Learning Dashboard
+# Bảng Điều Khiển Học Tập — Kỹ Thuật Hệ Thống (Learning Dashboard — Systems Engineering)
 
-Command center for tracking deliberate practice, mental model verification, and curriculum progression across the 18-month systems engineering roadmap.
-
----
-
-## Mission
-
-Build an uncompromising foundation in systems engineering through first-principles implementation, adversarial testing, and systematic debugging. Transition from consuming high-level abstractions to mastering the underlying physics of software: memory layouts, processor caches, operating system kernels, concurrency primitives, and durable network state.
+> **Trung tâm điều hành** theo dõi quá trình thực hành chủ động (Deliberate Practice), kiểm chứng mô hình tư duy (Mental Models), và quản lý tiến độ lộ trình 18 tháng Kỹ thuật Hệ thống (Systems Engineering Roadmap).
 
 ---
 
-## Current Position
+## 1. Sứ Mệnh & Nguyên Tắc Học Tập (Mission & Learning Principles)
 
-| Parameter | Current Value |
+Xây dựng nền tảng vững chắc, không thỏa hiệp trong Kỹ thuật Hệ thống thông qua việc hiện thực hóa từ nguyên lý đầu tiên (First-Principles Implementation), kiểm thử đối kháng (Adversarial Testing), và sửa lỗi có hệ thống (Systematic Debugging). Chuyển dịch từ việc tiêu thụ các tầng trừu tượng cấp cao sang làm chủ các quy luật cốt lõi của phần mềm: **bố cục bộ nhớ (Memory Layouts), bộ đệm vi xử lý (CPU Caches), nhân hệ điều hành (OS Kernels), các nguyên mẫu đồng thời (Concurrency Primitives), và trạng thái mạng bền vững (Durable Network State)**.
+
+---
+
+## 2. Vị Trí Hiện Tại (Current Position)
+
+| Tham Số (Parameter) | Giá Trị Hiện Tại (Current Value) |
 | :--- | :--- |
-| **Current Phase** | Phase 1: Toolchain, Memory, and Modern C++ Foundations |
-| **Current Month** | Month 1 of 18 (Execution Window: Weeks 1–4) |
-| **Current Topic** | Virtual memory layout, pointer arithmetic, memory alignment, and arena allocators |
-| **Current Core Question** | How does user-space dynamic allocation interact with kernel page allocation (`brk`/`mmap`), and what is the exact cache and TLB cost of allocator fragmentation? |
+| **Giai Đoạn Hiện Tại (Current Phase)** | **Phase 0** — Nền Tảng Toolchain & C++ Modern / Quản Lý Bộ Nhớ (*Toolchain, Memory, and Modern C++ Foundations*) |
+| **Tháng Hiện Tại (Current Month)** | **Tháng 1 (Month 1)** |
+| **Chủ Đề Hiện Tại (Current Topic)** | **Vòng Đời Đối Tượng, Thời Gian Lưu Trữ & Quyền Sở Hữu / RAII** (*C++ Object Lifetime, Storage Duration, Ownership & RAII Semantics*) |
+| **Tiến Độ Tổng Thể (Overall Progress)** | **0%** (*Điểm Xuất Phát / Baseline Start*) |
+| **Câu Hỏi Cốt Lõi (Current Core Question)** | Làm thế nào để gắn liền vòng đời tài nguyên với vòng đời đối tượng (`RAII`) và thiết lập cơ chế quản lý bộ nhớ an toàn, xác định (`Deterministic`) mà không bị rò rỉ bộ nhớ (`Memory Leaks`) hay truy cập bất hợp lệ (`Use-After-Free`)? |
 
 ---
 
-## This Week
+## 3. Trọng Tâm & Mục Tiêu Giai Đoạn (Phase Focus & Core Objectives)
 
-**Cadence:** Week 01 — Focus: Memory Layout, Alignment, and Arena Allocation
+### Mục Tiêu Học Tập Cốt Lõi (Core Learning Objectives)
+- **Quản lý Vòng đời & Thời gian lưu trữ (Storage Duration & Lifetime)**: Phân định ranh giới và đặc tính vận hành giữa 3 loại bộ nhớ: `static`, `automatic` (Stack), và `dynamic` (Heap).
+- **Nguyên lý RAII (Resource Acquisition Is Initialization)**: Đóng gói quản lý tài nguyên (bộ nhớ, file descriptors, locks) vào Destructor để đảm bảo dọn dẹp tự động và an toàn với Exception.
+- **Con trỏ thông minh & Semantics sở hữu (Smart Pointers & Ownership)**: Phân tích và làm chủ `std::unique_ptr` (sở hữu độc quyền / exclusive ownership) và `std::shared_ptr` (sở hữu chia sẻ / reference counting).
 
-### Weekly Goals
-- Map the ELF process address space into an empirical mental model via `/proc/[pid]/maps` and binary inspection tools.
-- Implement a contiguous-memory Arena Allocator in Modern C++ (C++20) supporting arbitrary type alignment.
-- Verify zero memory leaks and validate alignment guarantees under AddressSanitizer.
-
-### Weekly Tasks
-- [ ] Inspect an ELF binary layout using `readelf -S`, `objdump -d`, and `nm` to track text, data, bss, and rodata boundaries.
-- [ ] Write a minimal program that inspects its own virtual memory mapping by parsing `/proc/self/maps`.
-- [ ] Implement `ArenaAllocator` with bump-pointer allocation and RAII-based scope resets.
-- [ ] Implement `align_forward(uintptr_t ptr, size_t alignment)` handling power-of-two alignment calculations.
-- [ ] Stress-test the allocator with heterogeneous struct allocations and instrument with AddressSanitizer.
-
-### Weekly Deliverables
-- `experiments/memory-layout/inspect_elf.cpp`: Working binary layout introspection script.
-- `projects/memory-allocator/arena_allocator.hpp`: Header-only, zero-overhead arena allocator.
-- `projects/memory-allocator/tests/test_arena.cpp`: Unit test suite verifying alignment, boundary checks, and reset safety.
-- Benchmark report comparing `std::malloc` vs. `ArenaAllocator` allocation latency for 100,000 small objects.
+### Sản Phẩm Bàn Giao Cột Mốc (Phase Milestone Deliverables)
+- **Thư viện Quản lý Tài nguyên RAII**: Mã nguồn C++20 mẫu tuân thủ nghiêm ngặt không sử dụng `raw new/delete` thủ công.
+- **Hệ thống Kiểm thử Bộ nhớ**: Cấu hình pipeline biên dịch tích hợp cờ cảnh báo nghiêm ngặt (`-Wall -Wextra -Wpedantic -Werror`) cùng bộ công cụ kiểm thử rò rỉ bộ nhớ **AddressSanitizer (`-fsanitize=address`)** và **Valgrind**.
 
 ---
 
-## Active Learning Resources
+## 4. Tài Nguyên Học Tập Đang Sử Dụng (Active Learning Resources)
 
-### Primary Texts
-- **Computer Systems: A Programmer's Perspective (CS:APP3e)** — Bryant & O'Hallaron  
-  *Active Chapters:* Chapter 1 (Tour), Chapter 3 (Machine-Level Representation), Chapter 9 (Virtual Memory).
-- **The Linux Programming Interface (TLPI)** — Michael Kerrisk  
-  *Active Chapters:* Chapter 6 (Processes), Chapter 7 (Memory Allocation), Chapter 49 & 50 (Memory Mapping).
-- **Effective Modern C++** — Scott Meyers  
-  *Active Items:* Items 1–4 (Deducing Types), Items 7–10 (Modern C++ Idioms), Items 23–25 (Move Semantics & Rvalue References).
+### Giáo Trình Chính (Primary Texts)
+* **Computer Systems: A Programmer's Perspective (CS:APP3e)** — *Bryant & O'Hallaron*
+  *Trọng tâm nghiên cứu:* Chapter 1 (A Tour of Computer Systems), Chapter 3 (Machine-Level Representation of Programs).
+* **The Linux Programming Interface (TLPI)** — *Michael Kerrisk*
+  *Trọng tâm nghiên cứu:* Chapter 6 (Processes), Chapter 7 (Memory Allocation).
+* **Effective Modern C++** — *Scott Meyers*
+  *Trọng tâm nghiên cứu:* Items 1–4 (Deducing Types), Items 18–22 (Smart Pointers), Items 23–25 (Move Semantics & Rvalue References).
 
-### Documentation & Standards
-- [POSIX.1-2017 Specification](https://pubs.opengroup.org/onlinepubs/9699919799/) — Memory management, system calls (`brk`, `sbrk`, `mmap`, `munmap`).
-- [System V Application Binary Interface](https://gitlab.com/x86-psABIs/x86-64-ABI) — AMD64 Architecture Processor Supplement (Stack frame, register usage, alignment).
-- [cppreference.com](https://en.cppreference.com/w/) — `std::align`, `std::byte`, value categories, memory models.
+### Tài Liệu Chuẩn & Tiêu Chuẩn Kỹ Thuật (Documentation & Standards)
+* **POSIX.1-2017 Specification**: Quản lý bộ nhớ và lời gọi hệ thống cấp thấp (`brk`, `sbrk`, `mmap`).
+* **System V Application Binary Interface (AMD64 ABI)**: Khung Stack Frame, quy ước gọi hàm (Calling Conventions), thanh ghi và Alignment.
+* **C++20 Standard Reference (cppreference.com)**: `std::unique_ptr`, `std::move`, Value Categories (`lvalue`/`rvalue`), Storage Duration.
 
-### Tooling Manuals
-- GNU Debugger (GDB) Documentation (Memory examination `x/`, hardware watchpoints `watch`, layout registers `layout reg`).
-- AddressSanitizer (ASan) & LeakSanitizer (LSan) Compiler Flags & Runtime Flags Manual.
-
----
-
-## Understanding Tracker
-
-### What Do I Understand?
-- **Virtual Address Space vs. Physical Memory:** The OS presents each process with an isolated 64-bit address space. Addresses do not refer directly to physical RAM but to page table entries mapped by the MMU.
-- **Data Alignment Mechanics:** CPUs load data most efficiently when word addresses are multiples of data sizes. Misaligned loads either cause hardware penalties or require multiple memory cycles and bit shifts.
-- **Stack Frame Mechanics:** Return addresses, saved base pointers, and local variables are managed via `RSP`/`RBP` registers with predictable continuous push/pop overhead.
-
-### What Can I Explain?
-- Why standard `malloc()` prepends or stores chunk metadata, causing memory overhead for small allocations.
-- The difference between internal fragmentation (unused space inside allocated block due to alignment/padding) and external fragmentation (free memory broken into disjoint chunks too small to satisfy requests).
-- Why stack allocations are virtually free (pointer arithmetic on `RSP`) while heap allocations incur search, lock, and OS syscall overhead.
-
-### What Can I Build?
-- A bump allocator that claims a large contiguous buffer (via `mmap` or static array) and satisfies allocation requests in $O(1)$ time by advancing an offset.
-- Bitwise alignment functions using two's complement arithmetic (`(ptr + align - 1) & ~(align - 1)`).
-- Binary inspection tests that verify the memory layout of custom structs containing mixed-type members.
-
-### What Still Confuses Me?
-- **Kernel Lazy Page Allocation:** How many microseconds elapse between user-space calling `mmap(MAP_ANONYMOUS)` and the actual physical page allocation occurring upon the first write via minor page fault?
-- **TLB Shootdowns:** What is the exact performance penalty of multi-core TLB invalidation when unmapping large memory segments in concurrent environments?
-- **Allocator Metadata Protection:** How production allocators (e.g., jemalloc, mimalloc) guard metadata against buffer overflows without excessive performance cost.
+### Hướng Dẫn Công Cụ Chẩn Đoán (Diagnostic Tooling Manuals)
+* **GNU Debugger (GDB)**: Kiểm tra ô nhớ (`x/gx`), Hardware Watchpoints (`watch`), kiểm tra thanh ghi (`layout reg`).
+* **AddressSanitizer (ASan) & LeakSanitizer (LSan)**: Các cờ biên dịch và Runtime Environment Variables.
 
 ---
 
-## Debugging Journal
+## 5. Theo Dõi Nhận Thức & Năng Lực (Understanding Tracker)
 
-| Date | Problem | Hypothesis | Investigation | Result | Lesson Learned |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| 2026-10-08 | Segmentation fault during custom arena reset in stress test. | Pointer arithmetic overflow caused reset logic to write outside allocated region. | Ran executable under GDB; inspected `RSP`, `RBP`, and target memory address with `x/gx`. Used AddressSanitizer (`-fsanitize=address`). | Offset calculation was casting `char*` to `size_t` before adding alignment padding, leading to an underflow on boundary wrap. | Never perform pointer arithmetic on raw `void*` or unsigned integers without explicit boundary assertions. Use `std::byte*` and validate against `buffer_start + capacity`. |
-| *YYYY-MM-DD* | *Upcoming* | *Pending* | *Pending* | *Pending* | *Pending* |
+### Tôi Đã Hiểu Gì? (What Do I Understand?)
+- Định hướng lộ trình Kỹ thuật Hệ thống 18 tháng và phương pháp học tập dựa trên vòng lặp Debug có hệ thống.
+- Cấu trúc tổng quan của Phase 0: Quản lý bộ nhớ C++20, RAII, Smart Pointers, và Pipeline biên dịch CMake.
 
----
+### Tôi Có Thể Giải Thích Gì? (What Can I Explain?)
+- Mục tiêu của nguyên lý RAII trong việc tự động hóa quản lý vòng đời tài nguyên hệ thống.
+- Sự cần thiết của việc sử dụng các công cụ Memory Sanitizers (ASan/Valgrind) để phát hiện lỗi bộ nhớ sớm trong quá trình phát triển.
 
-## Learning Evidence
+### Tôi Có Thể Xây Dựng Gì? (What Can I Build?)
+- Thiết lập môi trường phát triển C++20 cơ bản trên Linux/WSL2 với GCC/Clang và CMake.
+- *Các dự án chuyên sâu đang ở điểm xuất phát (Baseline).*
 
-### Notes Written
-- [ ] `docs/memory-layout-amd64.md` — ELF layout, virtual address spaces, and kernel boundary mapping.
-- [ ] `docs/alignment-and-padding.md` — Data alignment constraints, cache line boundaries, and struct packing rules.
-
-### Experiments Completed
-- [ ] `experiments/memory-layout/` — Empirical observation of stack growth downward vs. heap growth upward.
-- [ ] `experiments/struct-padding/` — Measuring struct sizes across reordered member declarations.
-
-### Projects Completed
-- [ ] `projects/memory-allocator/` — Production-grade Arena Allocator with alignment support and unit test coverage.
-
-### Labs & Benchmarks Completed
-- [ ] `benchmarks/allocator-latency/` — Benchmarking allocation latency: `std::malloc` vs. `ArenaAllocator` across 1,000 to 1,000,000 iterations.
+### Tôi Còn Thắc Mắc Gì? (What Still Confuses Me?)
+- Cơ chế **Move Semantics** (`rvalue references &&`) biến đổi các thanh ghi và lệnh Assembly như thế nào ở tầng thấp dưới góc độ trình biên dịch?
+- Sự vi phạm **ODR** (*One Definition Rule*) diễn ra chính xác ra sao ở tầng Linker khi đưa cùng một hàm Inline vào nhiều Translation Units?
 
 ---
 
-## Open Questions
+## 6. Yêu Cầu Bằng Chứng Học Tập (Learning Evidence Requirements)
 
-1. **Memory:** When an application calls `free()`, under what exact threshold does `glibc` release memory back to the kernel via `brk()`/`sbrk()` versus keeping it in user-space bins for future reuse?
-2. **Hardware:** What is the exact cycle count penalty of a 64-byte unaligned memory access that crosses a cache line boundary on modern x86_64 architectures?
-3. **OS Interface:** How does the operating system schedule and handle minor page faults on huge pages (2MB/1GB) compared to standard 4KB pages?
-4. **Toolchain:** How do link-time optimization (LTO) passes reorganize code layout across translation units to maximize instruction cache hit rates?
-
----
-
-## Weekly Review
-
-**Review Period:** Week 01 Retrospective (Scheduled: End of Week)
-
-### What Went Well?
-- *To be completed at week conclusion: Record specific systems concepts mastered and benchmarks completed ahead of schedule.*
-
-### What Failed?
-- *To be completed at week conclusion: Document experiments that yielded unexpected behavior, invalidated hypotheses, or took significantly longer than anticipated.*
-
-### What Should Change Next Week?
-- *To be completed at week conclusion: Technical workflow adjustments, deeper profiling instrumentation, or revisions to test harness design.*
+| Danh Mục (Category) | Thành Phần Cần Hoàn Thành (Required Artifacts) | Trạng Thái (Status) |
+| :--- | :--- | :--- |
+| **Ghi Chú Kỹ Thuật (Technical Notes)** | `docs/memory-layout-amd64.md` (Bố cục bộ nhớ ELF, Không gian địa chỉ ảo, Ranh giới User/Kernel)<br>`docs/raii-and-ownership.md` (Nguyên lý RAII, Quyền sở hữu tài nguyên và Smart Pointers) | Chưa Bắt Đầu (*Not Started*) |
+| **Thực Nghiệm Lập Trình (Experiments)** | `experiments/stack-vs-heap/` (Quan sát chiều phát triển Stack và Heap)<br>`experiments/linker-errors/` (Kiểm tra Bảng ký hiệu Symbol Table qua `nm`/`objdump`) | Chưa Bắt Đầu (*Not Started*) |
+| **Đồ Án Cột Mốc (Milestone Projects)** | `projects/multi-module-cli/` (Dự án C++20 CLI Utility đa module quản lý bằng CMake - Phase 0 Milestone) | Chưa Bắt Đầu (*Not Started*) |
+| **Bài Lab & Benchmark** | `benchmarks/smart-pointer-overhead/` (Đo đạc chi phí chênh lệch thời gian giữa raw pointer, `unique_ptr`, `shared_ptr`) | Chưa Bắt Đầu (*Not Started*) |
 
 ---
 
-## Phase Exit Gate Progress
+## 7. Câu Hỏi Mở & Giả Thuyết Nghiên Cứu (Open Research Questions)
 
-**Phase 1 Gate Criteria: Toolchain, Memory, and Modern C++ Foundations**
+1. **Bộ Nhớ (Memory):** Khi đối tượng `std::unique_ptr` bị tiêu hủy, lệnh `delete` bên dưới sẽ gọi lời gọi hệ thống `brk()` / `sbrk()` ngay lập tức hay trả bộ nhớ về cho User-Space Allocator (`glibc ptmalloc`) quản lý?
+2. **Công Cụ (Toolchain):** Làm thế nào trình biên dịch (GCC/Clang) tối ưu hóa loại bỏ hoàn toàn chi phí trừu tượng (*Zero-Overhead Abstraction*) của `std::unique_ptr` để tạo ra mã Assembly tương đương con trỏ thô?
+3. **Liên Kết (Linker):** Sự khác biệt về bản chất giữa Static Linking (`.a`) và Dynamic Linking (`.so`) ảnh hưởng thế nào đến kích thước tệp thực thi và địa chỉ bộ nhớ khi nạp chương trình?
+4. **Chuẩn C++ (Language Standard):** Tại sao việc sử dụng `raw new/delete` lại bị coi là Anti-Pattern trong lập trình C++ hiện đại và trong các hệ thống đòi hỏi tính an toàn cao?
 
-```
-Phase 1 Exit Readiness: [=====>-----------------------------] 16% Completed
-```
+---
 
-| Evaluation Dimension | Standard Required for Phase Exit | Current Status | Evidence / Verification |
-| :--- | :--- | :---: | :--- |
-| **1. Knowledge** | Can explain without references: ELF segments, dynamic vs. static linking, virtual memory translation, page tables, cache hierarchies, struct layout, and C++ value categories. | In Progress | Drafted notes on virtual memory; pending verification against System V ABI documentation. |
-| **2. Implementation** | Implement clean, reproducible C++20 allocators (Arena, Pool, Slab) with custom allocator traits conforming to modern standards. | In Progress | Arena allocator prototype underway in `projects/memory-allocator/`. |
-| **3. Break** | Subject allocators to adversarial stress tests: deliberate misalignments, out-of-memory boundaries, zero-sized requests, and buffer overruns. | Pending | Stress test harness design drafted; fuzz testing queued. |
-| **4. Debugging** | Diagnose memory corruptions, stack smashings, and use-after-free conditions autonomously using GDB, Valgrind, and Sanitizers within 15 minutes. | In Progress | First incident logged in Debugging Journal; ASan workflows integrated into CMake. |
-| **5. Reasoning** | Formulate empirical, falsifiable hypotheses prior to running benchmarks; explain measured throughput/latency via hardware mechanics. | Pending | Microbenchmarks queued for Week 03. |
-| **6. Transfer** | Apply custom memory allocation techniques to a non-trivial domain (e.g., parsing an AST or network packet buffer) and measure performance gains. | Pending | Scheduled for Month 3 capstone project. |
+## 8. Tiến Độ Đạt Exit Gate (Phase Exit Gate Progress)
+
+### **Phase 0 Exit Gate: Toolchain, Memory, and Modern C++ Foundations**
+
+**Trạng Thái Hoàn Thành:** 0% (Điểm Xuất Phát / Baseline Start)
+
+| Dạng Đánh Giá (Evaluation Dimension) | Tiêu Chuẩn Bắt Buộc Để Qua Gate (Standard Required for Phase Exit) | Trạng Thái Hiện Tại (Current Status) | Bằng Chứng / Xác Minh (Evidence / Verification) |
+| :--- | :--- | :--- | :--- |
+| **1. Kiến Thức (Knowledge)** | Giải thích không cần tài liệu: Vòng đời đối tượng, Storage Duration, RAII, các giai đoạn Pipeline biên dịch (Preprocessor ➔ Linker), sự khác biệt giữa `unique_ptr` và `shared_ptr`. | Chưa Bắt Đầu (*Not Started*) | Chuẩn bị nghiên cứu tài liệu C++20 và cppreference. |
+| **2. Thực Thi (Implementation)** | Xây dựng dự án CLI đa module bằng C++20 chuẩn mực, quản lý bằng CMake, tuân thủ nghiêm ngặt quyền sở hữu RAII, không dùng `raw new/delete`. | Chưa Bắt Đầu (*Not Started*) | Dự án CLI chưa khởi tạo tại `projects/multi-module-cli/`. |
+| **3. Thử Thách Phá Đồ (Break)** | Chủ động tạo ra các lỗi vi phạm bộ nhớ: Memory Leaks, Use-After-Free, ODR Violations, Undefined Symbol Linker errors. | Chưa Bắt Đầu (*Not Started*) | Chưa thực hiện bài test vi phạm bộ nhớ. |
+| **4. Sửa Lỗi (Debugging)** | Chẩn đoán và định vị nguyên nhân rò rỉ bộ nhớ, truy cập bất hợp lệ bằng GDB, Valgrind và AddressSanitizer (`-fsanitize=address`) trong vòng 15 phút. | Chưa Bắt Đầu (*Not Started*) | Chưa cấu hình thử nghiệm cờ ASan trong CMakeLists.txt. |
+| **5. Tư Duy Lập Luận (Reasoning)** | Đưa ra giả thuyết có thể kiểm chứng bằng thực nghiệm trước khi chạy benchmark; giải thích được lý do chênh lệch hiệu năng bằng các quy luật bộ nhớ. | Chưa Bắt Đầu (*Not Started*) | Các bài microbenchmark dự kiến triển khai ở Tuần 3. |
+| **6. Chuyển Giao (Transfer)** | Giải thích được cách mô hình tư duy RAII áp dụng cho việc quản lý các tài nguyên hệ thống khác (ví dụ: Lock trên Database, Socket mạng, File Descriptor). | Chưa Bắt Đầu (*Not Started*) | Dự kiến thực hiện vào bài test Capstone cuối Month 2. |
+
+---
+*Bảng điều khiển được biên soạn và cập nhật liên tục theo tiến độ lộ trình Kỹ thuật Hệ thống 18 tháng (Core Systems Engineering Curriculum).*

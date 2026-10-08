@@ -1,68 +1,66 @@
-# Systems Engineering
+# Systems Engineering (Kỹ Thuật Hệ Thống)
 
-This repository serves as a technical log, experimentation bench, and evidence of deliberate practice across an 18-month Core Systems Engineering Curriculum. 
+Repository này đóng vai trò như một sổ tay kỹ thuật, môi trường thực nghiệm và bằng chứng cho quá trình rèn luyện chủ động (deliberate practice) theo **Chương Trình Cốt Lõi Kỹ Thuật Hệ Thống 18 Tháng** (18-Month Core Systems Engineering Curriculum).
 
-It is not a collection of course notes, syntax cheatsheets, tutorial follow-alongs, or framework prototypes. Every entry, implementation, and benchmark here is designed to isolate and understand the fundamental mechanics of computer systems: resource ownership, state transitions, concurrency primitives, OS abstractions, network communication, and failure modes under stress.
-
----
-
-## Current Status
-
-| Dimension | Details |
-| :--- | :--- |
-| **Active Phase** | Phase 1: Toolchain, Memory Layout, and C++ Systems Primitives |
-| **Current Focus** | Virtual memory translation, pointer arithmetic, custom arena allocators |
-| **Tooling Active** | GCC / Clang, CMake, GDB, Valgrind, AddressSanitizer (ASan) |
-| **Verification Gate** | Zero memory leaks, reproducible ASan diagnostics, determinism across builds |
-| **Start Date** | October 2026 |
-| **Target Completion** | April 2028 (18-Month Target) |
+Đây không phải là tập hợp ghi chú khóa học, tài liệu tra cứu cú pháp (cheatsheet), bài thực hành làm theo hướng dẫn (tutorial follow-alongs) hay ứng dụng mẫu dùng framework. Mỗi mục, phần cài đặt và bài kiểm thử hiệu năng (benchmark) tại đây được thiết kế nhằm cô lập và thấu hiểu cơ chế vận hành cốt lõi của hệ thống máy tính: **quyền sở hữu tài nguyên (resource ownership)**, **chuyển dịch trạng thái (state transitions)**, **các nguyên mẫu đồng thời (concurrency primitives)**, **trừu tượng hóa hệ điều hành (OS abstractions)**, **giao tiếp mạng (network communication)** và **mô hình thất bại khi vượt tải (failure modes under stress)**.
 
 ---
 
-## Why This Exists
-
-Modern software engineering frequently abstracts away hardware realities: allocation latency, cache hierarchies, context switches, kernel transitions, and non-deterministic network I/O. While abstractions provide rapid development cycles, building resilient, high-performance software requires understanding what happens when those abstractions leak or fail.
-
-The objectives of this repository are:
-1. **Document Deliberate Practice:** Move beyond surface-level API usage to internalize the operational mechanics of software.
-2. **Cultivate Engineering Mental Models:** Ground software design in hardware realities (CPU caches, MMU, page tables, ring buffers, network stacks).
-3. **Establish Rigorous Debugging Discipline:** Treat debugging not as trial-and-error guesswork, but as the systematic application of the scientific method to software state.
-4. **Produce Verifiable Artifacts:** Pair theoretical knowledge with concrete implementations, automated stress tests, profiling benchmarks, and root-cause post-mortems.
-
----
-
-## Learning Principles
-
-### 1. Mental Models Over Memorization
-APIs and framework syntaxes churn; the physics of hardware and the mathematical constraints of distributed state do not. Priority is given to understanding:
-- **Ownership:** Who allocates, who mutates, who frees, and who synchronizes.
-- **State & Invariants:** What states are valid, what transitions are permissible, and how invariants are preserved across failure boundaries.
-- **Communication:** How bytes move across processes, threads, and networks (copying overhead, buffering, framing, and backpressure).
-- **Failure:** How systems behave when disks stall, packets drop, allocations fail, or threads deadlock.
-- **Performance:** Hardware-sympathetic design, cache line alignment, memory bandwidth, branch prediction, and algorithmic complexity.
-
-### 2. The Build → Break → Observe → Fix Loop
-Learning occurs at the edge of failure. Every implementation follows a continuous cycle:
-1. **Build:** Implement the core abstraction from first principles using standard tooling.
-2. **Break:** Subject the implementation to adversarial inputs, concurrency races, memory pressure, and fault injection.
-3. **Observe:** Inspect memory dumps, system call traces, CPU counters, and sanitizer reports (`gdb`, `perf`, `strace`, `valgrind`, `sanitizers`).
-4. **Fix:** Re-architect to enforce invariant safety, prevent resource exhaustion, or eliminate race conditions.
-
-### 3. Debugging as the Scientific Method
-Bugs are deviations between the mental model and the execution model. Every debugging session follows:
-- **Observation:** Characterize the unexpected symptom (e.g., SEGFAULT, data corruption, latency spike).
-- **Hypothesis:** Formulate a falsifiable statement explaining the root cause based on systems fundamentals.
-- **Instrumentation:** Add assertions, hardware watchpoints, tracepoints, or minimal reproductions to isolate the fault without mutating the observed behavior.
-- **Verification:** Prove the fix by confirming that the reproduction test fails before the patch and passes cleanly under stress afterward.
-
-### 4. Durable Fundamentals Before Specialization
-Prioritize timeless engineering domains: memory models, assembly conventions, POSIX system calls, I/O multiplexing, and lock-free synchronization, prior to consuming high-level distributed systems frameworks or domain-specific tools.
+## Mục Lục (Table of Contents)
+1. [Lý Do Tồn Tại (Why This Exists)](#1-lý-do-tồn-tại-why-this-exists)
+2. [Triết Lý Học Tập (Learning Principles)](#2-triết-lý-học-tập-learning-principles)
+3. [Lộ Trình Chi Tiết 18 Tháng (18-Month Curriculum Phases)](#3-lộ-trình-chi-tiết-18-tháng-18-month-curriculum-phases)
+4. [Sơ Đồ Lộ Trình & Tiêu Chuẩn Chuyển Giai Đoạn (Roadmap & Execution Gates)](#4-sơ-đồ-lộ-trình--tiêu-chuẩn-chuyển-giai-đoạn-roadmap--execution-gates)
+5. [Bộ Câu Hỏi Định Hướng Kỹ Thuật (Engineering Questions)](#5-bộ-câu-hỏi-định-hướng-kỹ-thuật-engineering-questions)
+6. [Cấu Trúc Repository (Repository Structure)](#6-cấu-trúc-repository-repository-structure)
+7. [Tiêu Chuẩn Công Cụ & Kiểm Thử (Tooling & Verification Standards)](#7-tiêu-chuẩn-công-cụ--kiểm-thử-tooling--verification-standards)
 
 ---
 
-## 18-Month Curriculum Phases
+## 1. Lý Do Tồn Tại (Why This Exists)
 
-The curriculum is structured into six consecutive 3-month phases. Each phase culminates in a benchmarked milestone project accompanied by empirical test suites and debugging write-ups.
+Phần mềm hiện đại thường ẩn đi các thực tế phần cứng: độ trễ cấp phát bộ nhớ (allocation latency), phân cấp bộ nhớ đệm (cache hierarchies), chuyển ngữ cảnh (context switches), chuyển đổi không gian nhân (kernel transitions) và I/O mạng bất đồng bộ không định tính. Dù các trừu tượng hóa giúp đẩy nhanh tốc độ phát triển, việc xây dựng phần mềm có tính chống chịu cao (resilient) và hiệu năng vượt trội bắt buộc kỹ sư phải hiểu rõ điều gì xảy ra khi các trừu tượng đó bị rò rỉ hoặc thất bại.
+
+Mục tiêu cốt lõi của repository bao gồm:
+1. **Ghi lại quá trình rèn luyện chủ động (Document Deliberate Practice)**: Vượt qua việc sử dụng API bề nổi để thẩm thấu cơ chế vận hành bên trong của phần mềm.
+2. **Xây dựng mô hình tư duy kỹ thuật (Cultivate Engineering Mental Models)**: Gắn kết thiết kế phần mềm với thực tế phần cứng (CPU caches, MMU, page tables, ring buffers, network stacks).
+3. **Thiết lập kỷ luật Debug khoa học (Establish Rigorous Debugging Discipline)**: Xem debugging không phải là đoán mò thử-sai, mà là việc áp dụng phương pháp khoa học một cách hệ thống vào trạng thái phần mềm.
+4. **Tạo ra các sản phẩm kiểm chứng được (Produce Verifiable Artifacts)**: Song hành kiến thức lý thuyết với code thực thi cụ thể, bộ kiểm thử chịu tải tự động (automated stress tests), bài đo hiệu năng (profiling benchmarks) và phân tích nguyên nhân gốc rễ (root-cause post-mortems).
+
+---
+
+## 2. Triết Lý Học Tập (Learning Principles)
+
+### 2.1. Mô Hình Tư Duy Trên Hết (Mental Models Over Memorization)
+Cú pháp API và framework thay đổi liên tục; tuy nhiên, nguyên lý phần cứng và các ràng buộc toán học của trạng thái phân tán thì không đổi. Ưu tiên hàng đầu là thấu hiểu:
+* **Quyền sở hữu (Ownership)**: Ai cấp phát, ai thay đổi (mutate), ai giải phóng và ai đồng bộ hóa.
+* **Trạng thái & Bất biến (State & Invariants)**: Trạng thái nào là hợp lệ, chuyển dịch nào được phép và làm sao giữ vững bất biến qua ranh giới thất bại.
+* **Giao tiếp (Communication)**: Byte di chuyển thế nào qua các process, thread và mạng (chi phí copy, buffering, framing, backpressure).
+* **Thất bại (Failure)**: Hệ thống hành xử ra sao khi ổ đĩa nghẽn, mất gói tin (packet drop), lỗi cấp phát bộ nhớ, hoặc deadlock thread.
+* **Hiệu năng (Performance)**: Thiết kế tương thích phần cứng (hardware-sympathetic design), căn chỉnh cache line, băng thông bộ nhớ, dự đoán nhánh (branch prediction) và độ phức tạp thuật toán.
+
+### 2.2. Vòng Lặp Xây Dựng → Phá Vỡ → Quan Sát → Sửa Lỗi (Build → Break → Observe → Fix Loop)
+Sự học diễn ra ở ranh giới của sự cố. Mọi phần cài đặt đều tuân theo vòng lặp liên tục:
+1. **Build**: Cài đặt trừu tượng cốt lõi từ nguyên lý đầu tiên (first principles) bằng công cụ chuẩn.
+2. **Break**: Đưa vào dữ liệu độc hại (adversarial inputs), tranh chấp đồng thời (concurrency races), áp lực bộ nhớ (memory pressure) và bơm lỗi (fault injection).
+3. **Observe**: Soi chiếu memory dump, dấu vết system call, CPU counter và báo cáo từ công cụ kiểm tra (GDB, perf, strace, Valgrind, Sanitizers).
+4. **Fix**: Tái cấu trúc kiến trúc để bảo vệ bất biến, ngăn chặn cạn kiệt tài nguyên hoặc loại bỏ race condition.
+
+### 2.3. Debugging Là Phương Pháp Khoa Học (Debugging as the Scientific Method)
+Lỗi (bugs) là sự lệch pha giữa mô hình tư duy và mô hình thực thi. Mọi phiên debug đều tuân thủ:
+* **Quan sát (Observation)**: Mô tả chính xác hiện tượng bất thường (ví dụ: SEGFAULT, hỏng dữ liệu, vọt độ trễ).
+* **Giả thuyết (Hypothesis)**: Đưa ra phát biểu có thể bác bỏ (falsifiable) giải thích nguyên nhân gốc rễ dựa trên nguyên lý hệ thống.
+* **Thêm công cụ đo (Instrumentation)**: Thêm assertions, hardware watchpoints, tracepoints hoặc tạo mã tái hiện tối thiểu để cô lập lỗi mà không làm biến đổi hành vi đang quan sát.
+* **Xác minh (Verification)**: Chứng minh phương án sửa lỗi bằng cách xác nhận bài test tái hiện thất bại trước khi patch và vượt qua kiểm thử chịu tải sau khi sửa.
+
+### 2.4. Nền Tảng Bền Vững Trước Khi Chuyên Sâu (Durable Fundamentals Before Specialization)
+Ưu tiên các lĩnh vực kỹ thuật vượt thời gian: memory models, assembly conventions, POSIX system calls, I/O multiplexing, và lock-free synchronization trước khi sử dụng các framework hệ thống phân tán cấp cao hay công cụ chuyên biệt.
+
+---
+
+## 3. Lộ Trình Chi Tiết 18 Tháng (18-Month Curriculum Phases)
+
+Chương trình được chia thành 6 Phase liên tiếp (mỗi Phase 3 tháng). Mỗi Phase khép lại bằng một đồ án cột mốc (milestone project) có đo kiểm hiệu năng, bộ test tự động và báo cáo debug chi tiết.
 
 ```
 Months:  01-03        04-06        07-09        10-12        13-15        16-18
@@ -71,45 +69,45 @@ Focus:   Toolchain    OS & Sys     Concurrency  Networking   Stateful     Archit
          & Memory     Calls        & Atomics    & I/O Mux    Storage      & Scale
 ```
 
-### Phase 1: Toolchain, Memory, and Modern C++ Foundations (Months 1–3)
-- **Focus:** Compilation pipeline, ELF binaries, linkers, memory layout (stack, heap, BSS, text), pointer semantics, RAII, value categories, and custom memory management.
-- **Tools:** GCC, Clang, CMake, Make, `objdump`, `readelf`, `nm`, Valgrind, AddressSanitizer.
-- **Core Concepts:** Alignment, padding, cache lines, virtual address space, arena/slab allocators, move semantics, zero-overhead abstractions.
-- **Milestone Project:** Deterministic memory pool allocator and custom string/vector implementations with custom allocator support and zero heap fragmentation.
+### Phase 1: Toolchain, Memory & Modern C++ Foundations (Tháng 1–3)
+* **Trọng tâm**: Pipeline biên dịch (compilation pipeline), file nhị phân ELF, linker, layout bộ nhớ (Stack, Heap, BSS, Text), con trỏ (pointer semantics), RAII, value categories, và tự quản lý bộ nhớ.
+* **Công cụ**: GCC, Clang, CMake, Make, `objdump`, `readelf`, `nm`, Valgrind, AddressSanitizer (ASan).
+* **Khái niệm cốt lõi**: Alignment, padding, cache lines, virtual address space, arena/slab allocators, move semantics, zero-overhead abstractions.
+* **Đồ án cột mốc (Milestone Project)**: **Deterministic Memory Pool Allocator** & bộ cài đặt Custom String/Vector hỗ trợ custom allocator, đảm bảo không bị phân mảnh bộ nhớ Heap (zero heap fragmentation).
 
-### Phase 2: Operating Systems & System Call Abstractions (Months 4–6)
-- **Focus:** The kernel-user space boundary, system calls, virtual memory, process lifecycle, signal handling, and file system primitives.
-- **Tools:** `strace`, `ltrace`, GDB, POSIX APIs, `/proc` and `/sys` inspection.
-- **Core Concepts:** Context switching, page faults, `mmap`, copy-on-write, file descriptors, file table vs. inode table, inter-process communication (pipes, shared memory, domain sockets).
-- **Milestone Project:** Minimal UNIX-style process supervisor and custom POSIX shell supporting job control, piping, redirection, and signal propagation.
+### Phase 2: Operating Systems & System Call Abstractions (Tháng 4–6)
+* **Trọng tâm**: Ranh giới User/Kernel space, system calls, bộ nhớ ảo (virtual memory), vòng đời process, xử lý signal, và nguyên mẫu file system.
+* **Công cụ**: `strace`, `ltrace`, GDB, POSIX APIs, tra cứu `/proc` và `/sys`.
+* **Khái niệm cốt lõi**: Context switching, page faults, `mmap`, Copy-on-Write (COW), File Descriptors (FD), File table vs Inode table, Inter-Process Communication (Pipes, Shared Memory, UNIX Domain Sockets).
+* **Đồ án cột mốc (Milestone Project)**: **Minimal UNIX Process Supervisor & Custom POSIX Shell** hỗ trợ quản lý tiến trình (job control), chuyển hướng I/O (redirection), đường ống (piping) và truyền signal.
 
-### Phase 3: Concurrency, Multithreading, and Synchronization (Months 7–9)
-- **Focus:** Hardware memory models, cache coherence protocols (MESI), atomic operations, mutual exclusion primitives, and synchronization bugs.
-- **Tools:** ThreadSanitizer (TSan), Helgrind, GDB thread inspection, `perf`.
-- **Core Concepts:** Race conditions, deadlocks, livelocks, priority inversion, memory barriers, sequential consistency vs. acquire-release semantics, false sharing.
-- **Milestone Project:** High-throughput, bounded multi-producer multi-consumer (MPMC) lock-free ring buffer and thread pool with work-stealing capabilities.
+### Phase 3: Concurrency, Multithreading & Synchronization (Tháng 7–9)
+* **Trọng tâm**: Hardware memory models, giao thức nhất quán cache (MESI), atomic operations, nguyên mẫu loại trừ tương hỗ (mutex primitives), và lỗi đồng thời.
+* **Công cụ**: ThreadSanitizer (TSan), Helgrind, GDB thread inspection, `perf`.
+* **Khái niệm cốt lõi**: Race conditions, Deadlocks, Livelocks, Priority Inversion, Memory Barriers, Sequential Consistency vs Acquire-Release Semantics, False Sharing.
+* **Đồ án cột mốc (Milestone Project)**: **High-Throughput Bounded MPMC Lock-Free Ring Buffer** & Thread Pool hỗ trợ Work-Stealing.
 
-### Phase 4: Networking Protocols & I/O Multiplexing (Months 10–12)
-- **Focus:** The network stack (OSI/TCP-IP), socket programming, readiness/completion models, non-blocking I/O, and framing.
-- **Tools:** `tcpdump`, Wireshark, `netstat`/`ss`, `nc`, `curl`, `wrk`.
-- **Core Concepts:** TCP state machine (handshake, teardown, TIME_WAIT), flow control, congestion control, head-of-line blocking, event notification (`epoll`, `kqueue`, `io_uring`).
-- **Milestone Project:** Single-threaded, event-driven HTTP/1.1 and TCP server based on `epoll`, handling thousands of concurrent connections with zero blocking calls.
+### Phase 4: Networking Protocols & I/O Multiplexing (Tháng 10–12)
+* **Trọng tâm**: Chồng giao thức mạng (OSI/TCP-IP), lập trình Socket, mô hình I/O Readiness/Completion, Non-blocking I/O và Framing.
+* **Công cụ**: `tcpdump`, Wireshark, `netstat`/`ss`, `nc`, `curl`, `wrk`.
+* **Khái niệm cốt lõi**: Trạng thái TCP state machine (Handshake, Teardown, TIME_WAIT), Flow control, Congestion control, Head-of-Line blocking, Sự kiện thông báo (epoll, kqueue, io_uring).
+* **Đồ án cột mốc (Milestone Project)**: **Single-Threaded Event-Driven HTTP/1.1 & TCP Server** dựa trên `epoll`, xử lý hàng ngàn kết nối đồng thời với zero blocking calls.
 
-### Phase 5: Stateful Client-Server Systems & Storage Engines (Months 13–15)
-- **Focus:** Persistent state, data durability, write-ahead logging (WAL), crash recovery, serialization, and client-server wire protocols.
-- **Tools:** FIO, custom crash injection scripts, fault-injection harnesses.
-- **Core Concepts:** ACID semantics, fsync cost, write amplification, append-only logs, LSM-trees vs. B+ Trees, state machine replication basics.
-- **Milestone Project:** Embedded append-only key-value store with crash-consistent write-ahead logging, compaction, and a custom binary network protocol.
+### Phase 5: Stateful Client-Server Systems & Storage Engines (Tháng 13–15)
+* **Trọng tâm**: Trạng thái lưu trữ bền vững (persistent state), tính bền vững dữ liệu (data durability), ghi nhật ký trước (Write-Ahead Logging - WAL), khôi phục sau sự cố (crash recovery), serialization, và giao thức mạng nhị phân.
+* **Công cụ**: `fio`, kịch bản bơm lỗi sự cố (crash injection harnesses).
+* **Khái niệm cốt lõi**: Tính chất ACID, chi phí `fsync`, Write Amplification, Append-only logs, LSM-Trees vs B+ Trees, nguyên lý cơ bản của State Machine Replication.
+* **Đồ án cột mốc (Milestone Project)**: **Embedded Append-Only Key-Value Store** tích hợp WAL đảm bảo nhất quán khi crash, cơ chế nén dữ liệu (compaction) và giao thức mạng nhị phân tùy chỉnh.
 
-### Phase 6: Systems Architecture, Failure Modes, and Performance (Months 16–18)
-- **Focus:** System-level profiling, latency distributions (tail latency), saturation, graceful degradation, and resilient architecture.
-- **Tools:** `perf`, FlameGraph, eBPF / `bpftrace`, custom benchmark harnesses.
-- **Core Concepts:** Queueing theory basics (Little's Law), backpressure, circuit breaking, cache stampedes, hardware bottlenecks (memory bus vs. CPU bound).
-- **Milestone Project:** End-to-end distributed, fault-tolerant telemetry collector and query service with tail-latency SLAs and automated failure injection validation.
+### Phase 6: Systems Architecture, Failure Modes & Performance (Tháng 16–18)
+* **Trọng tâm**: Đo kiểm hiệu năng mức hệ thống (system-level profiling), phân bố độ trễ đuôi (tail latency), độ bão hòa (saturation), suy giảm mượt mà (graceful degradation), và kiến trúc chống chịu lỗi.
+* **Công cụ**: `perf`, FlameGraph, eBPF / `bpftrace`, bộ đo benchmark tùy chỉnh.
+* **Khái niệm cốt lõi**: Lý thuyết hàng đợi cơ bản (Little's Law), Backpressure, Circuit Breaking, Cache Stampedes, Nút thắt cổ chai phần cứng (Memory bus vs CPU bound).
+* **Đồ án cột mốc (Milestone Project)**: **End-to-End Distributed Fault-Tolerant Telemetry Collector & Query Service** đáp ứng SLA độ trễ đuôi và vượt qua các bài kiểm thử bơm lỗi tự động.
 
 ---
 
-## Roadmap
+## 4. Sơ Đồ Lộ Trình & Tiêu Chuẩn Chuyển Giai Đoạn (Roadmap & Execution Gates)
 
 ```mermaid
 flowchart TD
@@ -135,116 +133,92 @@ flowchart TD
     class P1,P2,P3,P4,P5,P6 phase;
 ```
 
-### Execution Gates
-Every phase transition requires satisfying strict criteria:
-- **No Undefined Behavior:** Zero warnings under `-Wall -Wextra -Wpedantic`, zero sanitizer errors (`ASan`, `TSan`, `UBSan`).
-- **Deterministic Verification:** Automated test suites verifying corner cases, out-of-memory handling, and invalid state transitions.
-- **Reproducible Benchmarks:** Microbenchmarks checking throughput, latency, and resource footprint across variable loads.
-- **Documented Post-Mortem:** At least one technical post-mortem detailing a non-trivial failure, root cause, and systemic resolution.
+### Tiêu Chuẩn Chuyển Giai Đoạn (Execution Gates)
+Mọi quá trình chuyển Phase đều bắt buộc thỏa mãn 4 tiêu chuẩn nghiêm ngặt:
+1. **Zero Undefined Behavior**: Không có warning khi dùng cờ `-Wall -Wextra -Wpedantic`, không có lỗi từ các công cụ Sanitizer (ASan, TSan, UBSan).
+2. **Kiểm Thử Định Tính Tự Động (Deterministic Verification)**: Bộ test tự động kiểm tra các trường hợp biên (corner cases), xử lý hết bộ nhớ (OOM) và chuyển dịch trạng thái bất hợp lệ.
+3. **Benchmark Có Thể Tái Hiện (Reproducible Benchmarks)**: Bài đo microbenchmark xác nhận băng thông (throughput), độ trễ (latency) và mức tiêu thụ tài nguyên dưới các mức tải khác nhau.
+4. **Báo Cáo Phân Tích Sự Cố (Documented Post-Mortem)**: Ít nhất 1 bài viết phân tích kỹ thuật chi tiết về một lỗi phức tạp, nguyên nhân gốc rễ và giải pháp triệt để.
 
 ---
 
-## Engineering Questions
+## 5. Bộ Câu Hỏi Định Hướng Kỹ Thuật (Engineering Questions)
 
-These questions serve as guiding lines of inquiry across experiments and implementations:
+Các câu hỏi này đóng vai trò kim chỉ nam trong suốt quá trình thực nghiệm và cài đặt code:
 
-### Memory & Hardware Boundary
-- What exact sequence of events occurs between CPU reset, program invocation (`execve`), and the first instruction in `main`?
-- How do hardware cache hierarchies, spatial/temporal locality, and false sharing manifest in high-frequency update loops?
-- What are the physical and OS overheads of page faults, translation lookaside buffer (TLB) misses, and memory fragmentation?
+### Bộ Nhớ & Ranh Giới Phần Cứng (Memory & Hardware Boundary)
+* Chuỗi sự kiện chính xác nào diễn ra từ khi CPU reset, gọi chương trình (`execve`), cho đến khi chỉ thị đầu tiên trong hàm `main()` được thực thi?
+* Cấu trúc phân cấp Cache phần cứng, tính định vị không gian/thời gian (spatial/temporal locality) và hiện tượng False Sharing biểu hiện như thế nào trong các vòng lặp cập nhật tần suất cao?
+* Chi phí vật lý và chi phí OS của Page Faults, TLB Misses và phân mảnh bộ nhớ (memory fragmentation) là bao nhiêu?
 
-### Concurrency & Hardware Coherence
-- Under what conditions does the compiler or hardware reorder loads and stores, and how do acquire-release memory orders prevent visible reordering?
-- How does the MESI cache coherence protocol resolve contention between multiple cores writing to adjacent bytes?
-- Where do spinlocks outperform mutexes, and at what core count or contention level does spinning cause systemic throughput collapse?
+### Đồng Thời & Nhất Quán Phần Cứng (Concurrency & Hardware Coherence)
+* Trong điều kiện nào trình biên dịch hoặc phần cứng được phép sắp xếp lại lệnh Read/Write (reordering), và mô hình Acquire-Release Memory Order ngăn chặn sự sắp xếp lại này như thế nào?
+* Giao thức nhất quán Cache MESI giải quyết tranh chấp giữa nhiều nhân CPU cùng ghi vào các byte liền kề ra sao?
+* Trong trường hợp nào Spinlock vượt trội hơn Mutex, và ở ngưỡng tranh chấp hoặc số nhân nào thì Spinlock gây ra sụt giảm hiệu năng toàn hệ thống?
 
-### Operating Systems & I/O
-- How does the kernel translate a blocking `read()` call into hardware device activity, and what is the exact cost of the associated context switch?
-- What internal data structures does `epoll` maintain in kernel space, and why does edge-triggered mode require non-blocking file descriptors?
-- What guarantees does `fsync()` actually provide across different storage media and filesystems during ungraceful power loss?
+### Hệ Điều Hành & I/O (Operating Systems & I/O)
+* Kernel dịch một lệnh `read()` chặn (blocking) thành hoạt động thiết bị phần cứng như thế nào, và chi phí chính xác của quá trình chuyển ngữ cảnh (context switch) liên quan là bao nhiêu?
+* Cấu trúc dữ liệu nội bộ nào được `epoll` duy trì trong kernel space, và tại sao chế độ Edge-Triggered lại bắt buộc đi kèm với Non-Blocking File Descriptors?
+* Lệnh `fsync()` thực sự mang lại bảo chứng gì trên các phương tiện lưu trữ và file system khác nhau khi mất điện đột ngột?
 
-### Networking & Distributed State
-- What are the mechanical tradeoffs between head-of-line blocking in TCP versus multiplexed streams in UDP-based protocols?
-- How does backpressure propagate from a slow consumer's socket buffer up through the network stack to throttle the sender?
-- How do invariants survive crash-restart boundaries when updating multi-file state without atomic hardware operations?
+### Mạng & Trạng Thái Phân Tán (Networking & Distributed State)
+* Đánh đổi cơ học giữa hiện tượng Head-of-Line Blocking trong TCP và việc đa multiplex các luồng trên các giao thức dựa trên UDP là gì?
+* Cơ chế Backpressure lan truyền từ socket buffer của bên nhận chậm ngược lên chồng giao thức mạng để tiết chế bên gửi như thế nào?
+* Các bất biến (invariants) tồn tại ra sao qua ranh giới khởi động lại sau sự cố (crash-restart) khi cập nhật trạng thái trên nhiều file mà không có thao tác phần cứng nguyên tử (atomic hardware operations)?
 
 ---
 
-## Repository Structure
+## 6. Cấu Trúc Repository (Repository Structure)
 
-The directory hierarchy is organized by curriculum domain, isolating production code, experiments, benchmarks, and technical logs.
+Cấu trúc thư mục được tổ chức theo các miền kiến thức, cô lập mã nguồn sản phẩm, thực nghiệm, bài đo hiệu năng và nhật ký kỹ thuật:
 
 ```
 Systems-Engineering/
-├── curriculum/               # Structured phases, syllabus outlines, and references
+├── curriculum/               # Danh sách các Phase, đề cương và tài liệu tham khảo
 │   ├── phase-01-memory/
 │   ├── phase-02-os/
 │   ├── phase-03-concurrency/
 │   ├── phase-04-networking/
 │   ├── phase-05-storage/
 │   └── phase-06-architecture/
-├── projects/                 # Core milestone systems built across the curriculum
-│   ├── memory-allocator/     # Phase 1: Arena, Slab, and Pool allocators
-│   ├── unix-shell/           # Phase 2: POSIX-compliant process supervisor & shell
-│   ├── lockfree-queue/       # Phase 3: MPMC ring buffer and thread pool
-│   ├── event-loop-server/    # Phase 4: epoll-driven non-blocking I/O engine
-│   └── wal-kv-store/         # Phase 5: Crash-resilient key-value store with WAL
-├── experiments/              # Isolated, single-file or minimal repro programs
-│   ├── cache-locality/       # Row-major vs. column-major memory access latency
-│   ├── memory-reordering/    # Reproducing weak-ordering violations across cores
-│   ├── context-switch-cost/  # Benchmarking thread vs. process context switch latency
-│   └── epoll-benchmarks/     # Comparing select/poll vs. epoll scalability
-├── investigations/           # Deep-dive debugging logs and post-mortems
+├── projects/                 # Các hệ thống cột mốc được xây dựng qua lộ trình
+│   ├── memory-allocator/     # Phase 1: Arena, Slab, và Pool allocators
+│   ├── unix-shell/           # Phase 2: POSIX process supervisor & shell
+│   ├── lockfree-queue/       # Phase 3: MPMC ring buffer & thread pool
+│   ├── event-loop-server/    # Phase 4: Engine I/O non-blocking dựa trên epoll
+│   └── wal-kv-store/         # Phase 5: Key-value store chống chịu sự cố với WAL
+├── experiments/              # Mã nguồn thực nghiệm ngắn gọn, đơn file
+│   ├── cache-locality/       # Độ trễ truy cập bộ nhớ Row-major vs Column-major
+│   ├── memory-reordering/    # Tái hiện lỗi weak-ordering giữa các nhân CPU
+│   ├── context-switch-cost/  # Đo độ trễ chuyển ngữ cảnh Thread vs Process
+│   └── epoll-benchmarks/     # So sánh khả năng mở rộng select/poll vs epoll
+├── investigations/           # Nhật ký debug chuyên sâu và báo cáo post-mortems
 │   ├── 001-asan-heap-overflow/
 │   └── 002-tsan-data-race/
-├── docs/                     # Visualized mental models and structural notes
+├── docs/                     # Mô hình tư duy trực quan hóa và ghi chú kiến trúc
 │   ├── memory-models.md
 │   ├── tcp-lifecycle.md
 │   └── synchronization-primitives.md
-├── scripts/                  # Profiling, benchmark harnesses, and sanitizer runners
-├── CMakeLists.txt            # Top-level build configuration
-├── LICENSE                   # Open-source license (MIT)
-└── README.md                 # Primary orientation and engineering index
+├── scripts/                  # Kịch bản đo hiệu năng, profiling và chạy Sanitizer
+├── CMakeLists.txt            # Cấu hình build dự án cấp cao nhất
+├── LICENSE                   # Giấy phép mã nguồn mở (MIT)
+└── README.md                 # Tài liệu định hướng và chỉ mục kỹ thuật chính
 ```
 
 ---
 
-## How Progress Is Tracked
+## 7. Tiêu Chuẩn Công Cụ & Kiểm Thử (Tooling & Verification Standards)
 
-Progress is tracked through empirical results and technical post-mortems rather than hours spent or checkmarks completed.
+Tất cả mã nguồn đưa vào repository bắt buộc tuân thủ các tiêu chuẩn biên dịch và kiểm tra nghiêm ngặt:
 
-### 1. Investigation & Post-Mortem Format
-Every significant defect or performance anomaly discovered during experiments is logged in `/investigations` using a standard incident schema:
-- **Symptom:** Unambiguous description of the unexpected behavior or failure state.
-- **Environment:** OS kernel version, architecture, compiler flags, and tooling versions.
-- **Reproduction:** Minimal, standalone code demonstrating the fault deterministically.
-- **Telemetry & Traces:** Output from GDB, `strace`, Valgrind, or Sanitizers.
-- **Root Cause:** Deep architectural/systems explanation of why the failure occurred.
-- **Resolution:** Code changes implemented, architectural invariants added, and proof of passing verification tests.
-
-### 2. Engineering Log Entry Schema
-Day-to-day progress entries follow an empirical record format:
-
-```markdown
-### [YYYY-MM-DD] - Topic / Investigation Title
-- **Objective:** What specific hypothesis or system component is being tested?
-- **Implementation:** Architectural design choices, data structures, and POSIX primitives used.
-- **Observed Metrics:** Benchmark results, latency distributions, or memory overhead measured.
-- **Key Takeaway:** Hardware or kernel mental model validated by the experiment.
-- **Artifacts:** Links to code, benchmark scripts, and reproduction tests.
-```
+* **Chuẩn Ngôn Ngữ (Language Standard)**: Modern C++ (C++20 / C++23) sử dụng cờ `-std=c++20` hoặc `-std=c++23`.
+* **Cảnh Báo Biên Dịch (Compiler Warnings)**: `-Wall -Wextra -Wpedantic -Wconversion -Wshadow -Werror`.
+* **Kiểm Tra Công Cụ Sanitizer (Sanitizer Verification)**: Chạy sạch sẽ không lỗi qua:
+  * AddressSanitizer (`-fsanitize=address`)
+  * UndefinedBehaviorSanitizer (`-fsanitize=undefined`)
+  * ThreadSanitizer (`-fsanitize=thread`)
+* **Kiểm Tra Rò Rỉ Bộ Nhớ (Leak Checking)**: Chạy sạch sẽ dưới Valgrind:
+  `valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes`
+* **Kỷ Luật Build (Build Discipline)**: Biên dịch out-of-source bằng CMake với các cấu hình riêng biệt cho `Debug`, `Release`, và `Sanitize`.
 
 ---
-
-## Tooling & Verification Standards
-
-All code committed to this repository adheres to strict build and inspection standards:
-
-- **Language Standard:** Modern C++ (C++20 / C++23) using `-std=c++20` or `-std=c++23`.
-- **Compiler Warnings:** `-Wall -Wextra -Wpedantic -Wconversion -Wshadow -Werror`.
-- **Sanitizer Verification:** Clean runs across:
-  - AddressSanitizer (`-fsanitize=address`)
-  - UndefinedBehaviorSanitizer (`-fsanitize=undefined`)
-  - ThreadSanitizer (`-fsanitize=thread`)
-- **Leak Checking:** Clean execution under `valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes`.
-- **Build Discipline:** Out-of-source CMake builds with dedicated configurations for `Debug`, `Release`, and `Sanitize`.
