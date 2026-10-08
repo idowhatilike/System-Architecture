@@ -1,10 +1,10 @@
-# 📘 Core Systems Engineering Curriculum Blueprint (18-Month Roadmap)
+# Core Systems Engineering Curriculum Blueprint (18-Month Roadmap)
 
 > **Mục tiêu**: Xây dựng tư duy kỹ sư hệ thống có khả năng khảo sát, phân tích và sửa lỗi các hệ thống máy tính phức tạp ("black-box systems") thông qua mô hình tư duy bền vững (durable mental models) thay vì học thuộc lòng lệnh hoặc API.
 
 ---
 
-## 📌 Mục Lục (Table of Contents)
+## Mục Lục (Table of Contents)
 1. [Triết Lý Kỹ Thuật & Khung Tư Duy (Engineering Philosophy)](#1-triết-lý-kỹ-thuật--khung-tư-duy-engineering-philosophy)
 2. [Kiến Trúc Phụ Thuộc Concept (Dependency Architecture)](#2-kiến-trúc-phụ-thuộc-concept-dependency-architecture)
 3. [Lộ Trình Chi Tiết 18 Tháng (18-Month Timeline)](#3-lộ-trình-chi-tiết-18-tháng-18-month-timeline)
@@ -15,14 +15,14 @@
 8. [Tiêu Chuẩn Đánh Giá Exit Gates (Exit Gate Evaluation Framework)](#8-tiêu-chuẩn-đánh-giá-exit-gates-exit-gate-evaluation-framework)
 9. [Định Hướng Chuyên Sâu (Specialization Gates)](#9-định-hướng-chuyên-sâu-specialization-gates)
 10. [Phạm Vi Hoãn Lại (Scope Control / Exclusions)](#10-phạm-vi-hoãn-lại-scope-control--exclusions)
-11. [💡 Thẻ Ôn Tập Active Recall (Flashcards & Self-Test Questions)](#11--thẻ-ôn-tập-active-recall-flashcards--self-test-questions)
+11. [Thẻ Ôn Tập Active Recall (Flashcards & Self-Test Questions)](#11--thẻ-ôn-tập-active-recall-flashcards--self-test-questions)
 
 ---
 
 <a id="1-triết-lý-kỹ-thuật--khung-tư-duy-engineering-philosophy"></a>
 ## 1. Triết Lý Kỹ Thuật & Khung Tư Duy (Engineering Philosophy)
 
-### 🎯 Kim Chỉ Nam (The North Star)
+### Kim Chỉ Nam (The North Star)
 Khi đứng trước một hệ thống kiến trúc ẩn (black-box architecture), người học phải tự trả lời 10 câu hỏi cốt lõi:
 - [ ] **What is running?** (Cái gì đang chạy?)
 - [ ] **Where is the state?** (Trạng thái nằm ở đâu?)
@@ -35,7 +35,7 @@ Khi đứng trước một hệ thống kiến trúc ẩn (black-box architectur
 - [ ] **How can the system be observed?** (Làm sao để quan sát hệ thống?)
 - [ ] **Which layer should I descend into next to test a hypothesis?** (Nên hạ xuống tầng nào tiếp theo để kiểm chứng giả thuyết?)
 
-### 🔄 Vòng Lặp Debug (The Debugging Loop)
+### Vòng Lặp Debug (The Debugging Loop)
 Debugging là việc áp dụng phương pháp khoa học vào hệ thống phần mềm:
 ```
 Reproduce (Tái hiện) ➔ Observe (Quan sát) ➔ Hypothesize (Đưa giả thuyết) ➔ Measure (Đo lường) ➔ Locate Layer (Xác định tầng) ➔ Fix (Sửa) ➔ Verify (Xác minh)
@@ -149,32 +149,32 @@ graph TD
 <a id="6-danh-sách-đồ-án-lớn-project-specifications"></a>
 ## 6. Danh Sách Đồ Án Lớn (Project Specifications)
 
-### 🛠️ Project 1: Multi-Module CLI Utility (Phase 0)
+### Project 1: Multi-Module CLI Utility (Phase 0)
 - **Mục tiêu**: Xây dựng phần mềm C++ đa module quản lý bằng [CMake](CMake) với quyền sở hữu RAII nghiêm ngặt ([MIT Missing Semester](MIT_Missing_Semester)).
 - **Kiến trúc**: Core Static Library + CLI Executable.
 - **Tiêu chuẩn nghiệm thu**: Biên dịch sạch sẽ; không rò rỉ bộ nhớ/truy cập bất hợp lệ dưới [Valgrind](Valgrind)/[ASan](Valgrind_ASan); không dùng `raw new/delete`.
 
-### 🐚 Project 2: Strict Mini-Shell (Phase 1)
+### Project 2: Strict Mini-Shell (Phase 1)
 - **Mục tiêu**: Thể hiện việc tạo process OS và trừu tượng hóa system call.
 - **Kiến trúc**: Parse ➔ Fork ➔ Exec ➔ Wait.
 - **Tiêu chuẩn nghiệm thu**: Xử lý đúng thất bại của `fork`/`exec`, thu dọn child process (tránh Zombie), báo cáo chính xác exit status.
 
-### 📊 Project 3: Locality Benchmark (Phase 2)
+### Project 3: Locality Benchmark (Phase 2)
 - **Mục tiêu**: Đo lường ảnh hưởng của cache vật lý tới hiệu năng dựa trên layout bộ nhớ.
 - **Kiến trúc**: So sánh cùng logic trên 2 layout: AoS (Array of Structures) vs SoA (Structure of Arrays).
 - **Tiêu chuẩn nghiệm thu**: Báo cáo thực nghiệm chứng minh sự khác biệt hiệu năng trên tập dữ liệu đủ lớn ([CS:APP Chapter 6](CSAPP_Ch6)); giải thích nguyên nhân bằng cache lines qua [perf](perf).
 
-### 🔌 Project 4: Raw Socket Stateful Server (Phase 3)
+### Project 4: Raw Socket Stateful Server (Phase 3)
 - **Mục tiêu**: Quản lý thực thi đồng thời và luồng byte TCP thô.
 - **Kiến trúc**: Multi-threaded Server xử lý nhiều clients.
 - **Tiêu chuẩn nghiệm thu**: Xử lý đồng thời, buffer đúng partial reads/writes ([Beej's Guide](Beej_Guide)), vượt qua kiểm tra rượt đuổi dữ liệu (data races) của [ThreadSanitizer](ThreadSanitizer), giải quyết deadlock scenarios.
 
-### 🏗️ Project 5: The Great Refactoring (Phase 4)
+### Project 5: The Great Refactoring (Phase 4)
 - **Mục tiêu**: Áp dụng Dependency Direction và cô lập ranh giới module ([A Philosophy of Software Design](A_Philosophy_of_Software_Design) / [Clean Architecture](Clean_Architecture)).
 - **Kiến trúc**: Network Layer ➔ Protocol Layer ➔ Application Layer.
 - **Tiêu chuẩn nghiệm thu**: Core application policy không phụ thuộc trực tiếp vào Network API; Unit tests kiểm tra framing/state invariants chạy hoàn toàn trên bộ nhớ (không cần I/O mạng).
 
-### 🌐 Project 6: Stateful Collaborative Server (Phase 5)
+### Project 6: Stateful Collaborative Server (Phase 5)
 - **Mục tiêu**: Xây dựng hệ thống Client-Server resilient, state-authoritative ([Understanding Distributed Systems](Understanding_Distributed_Systems)).
 - **Tính năng**: State validation, failure detection, cleanup synchronization, backpressure.
 - **Tiêu chuẩn nghiệm thu**: Từ chối state proposal bất hợp lệ; phát hiện client ngắt kết nối; dọn dẹp stale state an toàn; áp dụng chính sách Backpressure (reject/drop/throttle) khi queue tràn.
@@ -217,12 +217,12 @@ Mọi Exit Gate đều đánh giá theo tiêu chuẩn **Pass/Fail** dựa trên 
 
 Sau khi hoàn thành `CORE COMPLETE` (Tháng 18), kỹ sư có nền móng vững chắc để chuyển sang các hướng chuyên sâu:
 
-- [ ] 🎮 **Game Development (UE5)**: TCP framing & State authority ➔ Game networking, replication, synchronization.
-- [ ] 🖥️ **Backend Engineering**: Concurrency invariants ➔ Transaction isolation, DB consistency, HTTP/gRPC, Rate limiting.
-- [ ] 🛡️ **Cybersecurity**: Boundary testing ➔ Fuzzing, Memory safety, Exploitation mitigation.
-- [ ] ⚙️ **Systems / Low-Level**: Virtual memory & Execution model ➔ Kernel, Drivers, Embedded systems.
-- [ ] ⚡ **HFT / High-Performance Engineering**: Cache locality & I/O reasoning ➔ Latency engineering, HFT systems.
-- [ ] 🌐 **Networking**: Socket API ➔ Custom Protocol Engineering, SDN.
+- [ ] **Game Development (UE5)**: TCP framing & State authority ➔ Game networking, replication, synchronization.
+- [ ] **Backend Engineering**: Concurrency invariants ➔ Transaction isolation, DB consistency, HTTP/gRPC, Rate limiting.
+- [ ] **Cybersecurity**: Boundary testing ➔ Fuzzing, Memory safety, Exploitation mitigation.
+- [ ] **Systems / Low-Level**: Virtual memory & Execution model ➔ Kernel, Drivers, Embedded systems.
+- [ ] **HFT / High-Performance Engineering**: Cache locality & I/O reasoning ➔ Latency engineering, HFT systems.
+- [ ] **Networking**: Socket API ➔ Custom Protocol Engineering, SDN.
 
 ---
 
@@ -230,20 +230,20 @@ Sau khi hoàn thành `CORE COMPLETE` (Tháng 18), kỹ sư có nền móng vữn
 ## 10. Phạm Vi Hoãn Lại (Scope Control / Exclusions)
 
 Để tránh phình đại phạm vi (Scope Creep), các chủ đề sau **cố tình KHÔNG nằm trong 18 tháng cốt lõi**:
-- ❌ **Advanced Data Structures & Algorithms**: Chỉ cần năng lực thuật toán cơ bản.
-- ❌ **Production Databases (PostgreSQL, Redis)**: Hoãn lại tới Backend Specialization (cần tự quản lý state/concurrency trước).
-- ❌ **Kubernetes / Cloud Deployments (AWS/GCP)**: Hoãn lại để tránh trừu tượng hóa quá sớm.
-- ❌ **Distributed Consensus (Raft/Paxos) & Multi-node**: Hoãn lại; tập trung vào single-server / client-server.
-- ❌ **Game Engines (Unreal/Unity)**: Hoãn lại tới Game Dev Specialization.
-- ❌ **Offensive Cybersecurity / Exploitation**: Dùng security như lăng kính thiết kế chứ không học thủ thuật hack.
+- **Advanced Data Structures & Algorithms**: Chỉ cần năng lực thuật toán cơ bản.
+- **Production Databases (PostgreSQL, Redis)**: Hoãn lại tới Backend Specialization (cần tự quản lý state/concurrency trước).
+- **Kubernetes / Cloud Deployments (AWS/GCP)**: Hoãn lại để tránh trừu tượng hóa quá sớm.
+- **Distributed Consensus (Raft/Paxos) & Multi-node**: Hoãn lại; tập trung vào single-server / client-server.
+- **Game Engines (Unreal/Unity)**: Hoãn lại tới Game Dev Specialization.
+- **Offensive Cybersecurity / Exploitation**: Dùng security như lăng kính thiết kế chứ không học thủ thuật hack.
 
 ---
 
 <a id="11--thẻ-ôn-tập-active-recall-flashcards--self-test-questions"></a>
-## 11. 💡 Thẻ Ôn Tập Active Recall (Flashcards & Self-Test Questions)
+## 11. Thẻ Ôn Tập Active Recall (Flashcards & Self-Test Questions)
 
 <details>
-<summary><b>❓ [Phase 0] RAII và Smart Pointers hoạt động như thế nào?</b></summary>
+<summary><b> [Phase 0] RAII và Smart Pointers hoạt động như thế nào?</b></summary>
 
 - **Khái niệm**: RAII (Resource Acquisition Is Initialization) gắn liền vòng đời tài nguyên với vòng đời đối tượng stack. Khi đối tượng ra khỏi scope, destructor tự động giải phóng tài nguyên.
 - **Con trỏ**:
@@ -254,7 +254,7 @@ Sau khi hoàn thành `CORE COMPLETE` (Tháng 18), kỹ sư có nền móng vữn
 </details>
 
 <details>
-<summary><b>❓ [Phase 1] Phân biệt Program và Process? Sự khác biệt giữa Zombie và Orphan process?</b></summary>
+<summary><b> [Phase 1] Phân biệt Program và Process? Sự khác biệt giữa Zombie và Orphan process?</b></summary>
 
 - **Program vs Process**: Program là tập hợp bytes tĩnh trên đĩa; Process là ngữ cảnh thực thi động trong bộ nhớ với tài nguyên riêng do OS quản lý.
 - **Zombie Process**: Child process đã kết thúc nhưng Parent process chưa gọi `wait()` / `waitpid()` để thu dọn exit status.
@@ -262,32 +262,31 @@ Sau khi hoàn thành `CORE COMPLETE` (Tháng 18), kỹ sư có nền móng vữn
 </details>
 
 <details>
-<summary><b>❓ [Phase 2] Page Fault là gì? Tại sao duyệt mảng 2D theo cột lại chậm hơn theo hàng?</b></summary>
+<summary><b> [Phase 2] Page Fault là gì? Tại sao duyệt mảng 2D theo cột lại chậm hơn theo hàng?</b></summary>
 
 - **Page Fault**: Là cơ chế phần cứng/OS khi địa chỉ bộ nhớ ảo được truy cập chưa có sẵn trong RAM vật lý. Page fault có thể hoàn toàn bình thường (demand paging) hoặc do truy cập trái phép (dẫn tới `SIGSEGV`).
 - **Duyệt mảng 2D**: Trong C/C++, mảng 2D lưu theo thứ tự hàng (Row-Major Order). Duyệt theo hàng tận dụng được **Spatial Locality** (các phần tử kề nhau nằm chung 1 Cache Line 64-bytes). Duyệt theo cột gây Cache Miss liên tục vì nhảy ô nhớ xa.
 </details>
 
 <details>
-<summary><b>❓ [Phase 3] Mutex bảo vệ cái gì? Cạm bẫy Partial I/O trong TCP là gì?</b></summary>
+<summary><b> [Phase 3] Mutex bảo vệ cái gì? Cạm bẫy Partial I/O trong TCP là gì?</b></summary>
 
 - **Mutex**: Mutex không phải chỉ bảo vệ một biến; Mutex bảo vệ **Bất biến trạng thái (State Invariant)** hoặc một giao thức trạng thái dùng chung.
 - **Partial I/O Trap**: TCP là luồng byte không có ranh giới tin nhắn (stream-oriented). Một lệnh `send()` không bảo đảm tương ứng 1 lệnh `recv()`. Ứng dụng phải dùng **Framing** (ví dụ: length-prefixed protocol) để gom đuôi byte hoàn chỉnh trước khi xử lý.
 </details>
 
 <details>
-<summary><b>❓ [Phase 4] Phân biệt Dependency Inversion Principle và Dependency Injection?</b></summary>
+<summary><b> [Phase 4] Phân biệt Dependency Inversion Principle và Dependency Injection?</b></summary>
 
 - **Dependency Inversion**: Là nguyên lý kiến trúc — Module cấp cao không phụ thuộc vào Module cấp thấp; cả hai phụ thuộc vào Trừu tượng (Abstraction).
 - **Dependency Injection**: Là một kỹ thuật triển khai (implementation technique) để cung cấp dependency từ bên ngoài vào thay vì tự khởi tạo bên trong.
 </details>
 
 <details>
-<summary><b>❓ [Phase 5] Khác biệt giữa Failure Detection và Failure Handling? Backpressure là gì?</b></summary>
+<summary><b> [Phase 5] Khác biệt giữa Failure Detection và Failure Handling? Backpressure là gì?</b></summary>
 
 - **Failure Detection vs Handling**: Detection (Timeout, Heartbeat, Reset) phát hiện sự cố; Handling (Cleanup, Releasing State) xử lý dọn dẹp tài nguyên. Hai quá trình này phải đồng bộ hóa để tránh race condition.
 - **Backpressure**: Là phản ứng của hệ thống khi tốc độ tới > tốc độ xử lý. Các chính sách xử lý bao gồm: Bounded queues, Reject mới, Throttle nguồn gửi, Drop gói tin ưu tiên thấp.
 </details>
 
 ---
-*Tài liệu được biên soạn và tối ưu hóa cho học tập dựa trên Core Systems Engineering Curriculum Blueprint.*
