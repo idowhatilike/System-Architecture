@@ -1,70 +1,41 @@
-# Note : Phase 0 - C++ Lifetime, RAII, Smart Pointers, CMake Toolchain Pipeline 
-
-__
-
-## 1. Trọng Tâm & Mục Tiêu Giai Đoạn (Phase Focus & Core Objectives)
-
-### Mục Tiêu Học Tập Cốt Lõi (Core Learning Objectives)
-- **Quản lý Vòng đời & Thời gian lưu trữ (Storage Duration & Lifetime)**: Phân định ranh giới và đặc tính vận hành giữa 3 loại bộ nhớ: `static`, `automatic` (Stack), và `dynamic` (Heap).
-- **Nguyên lý RAII (Resource Acquisition Is Initialization)**: Đóng gói quản lý tài nguyên (bộ nhớ, file descriptors, locks) vào Destructor để đảm bảo dọn dẹp tự động và an toàn với Exception.
-- **Con trỏ thông minh & Semantics sở hữu (Smart Pointers & Ownership)**: Phân tích và làm chủ `std::unique_ptr` (sở hữu độc quyền / exclusive ownership) và `std::shared_ptr` (sở hữu chia sẻ / reference counting).
-
-### Sản Phẩm Bàn Giao Cột Mốc (Phase Milestone Deliverables)
-- **Thư viện Quản lý Tài nguyên RAII**: Mã nguồn C++20 mẫu tuân thủ nghiêm ngặt không sử dụng `raw new/delete` thủ công.
-- **Hệ thống Kiểm thử Bộ nhớ**: Cấu hình pipeline biên dịch tích hợp cờ cảnh báo nghiêm ngặt (`-Wall -Wextra -Wpedantic -Werror`) cùng bộ công cụ kiểm thử rò rỉ bộ nhớ **AddressSanitizer (`-fsanitize=address`)** và **Valgrind**.
+# Day 002 : Introducion to OS (9 / 10 / 2026)
 
 ---
 
-## 2. Tài Nguyên Học Tập Đang Sử Dụng (Active Learning Resources)
+## I/ OS là gì và tác dụng
 
-### Giáo Trình Chính (Primary Texts)
-* **Computer Systems: A Programmer's Perspective (CS:APP3e)** — *Bryant & O'Hallaron*
-  *Trọng tâm nghiên cứu:* Chapter 1 (A Tour of Computer Systems), Chapter 3 (Machine-Level Representation of Programs).
-* **The Linux Programming Interface (TLPI)** — *Michael Kerrisk*
-  *Trọng tâm nghiên cứu:* Chapter 6 (Processes), Chapter 7 (Memory Allocation).
-* **Effective Modern C++** — *Scott Meyers*
-  *Trọng tâm nghiên cứu:* Items 1–4 (Deducing Types), Items 18–22 (Smart Pointers), Items 23–25 (Move Semantics & Rvalue References).
+Chạy chương trình = Thực thi vô số lệnh lệnh (instructions) . Tiến trình (processor) sẽ thực hiện ba bước : 
+- Tìm và nạp (fetches) lệnh từ bộ nhớ
+- Giải mã (decodes) lệnh (Hiểu , tìm ra lệnh này là gì ?)
+- Thực thi (executes) lệnh (Làm theo đúng những gì lệnh bảo)
+Đó cơ bản là mô hình máy tính đơn giản theo Von Neumann .
+Đơn giản nhưng khi chạy cần vô số thao tác để khiến hệ thống dễ dùng .
+Và phần mền (software) chịu trách nhiệm khiến dễ dàng chạy chương trình như :
++ Cấp phát và chia sẽ bộ nhớ
++ Cho phép ứng dụng thao tác với thiết bị
++ ... v.v
+-> Gọi là Operating System (OS) . Thứ giúp chúng ta dễ dàng thao tác máy tính
+- Kỹ thuật kinh điển của OS để giúp chúng ta dễ dàng hơn là sự ảo hóa . Biến tài nguyên cứng -> ảo , nên ta gọi OS = máy ảo (virtual machine) 
+- OS còn cho phép chúng ta thao tác với tính năng của máy ảo và cung cấp hoàng loạt các API (interfaces) cũng như vô số lệnh gọi hệ thống (system calls) nên ta còn gọi OS = thư viện chuẩn (standard libary) . Và vì đồng thời quản lý tài nguyên , như ảo hóa các tài nguyên và đồng thời cho các ứng dụng tiếp cận đến vùng tài nguyên cần thiết như dữ liệu (data) hay thiết bị (devices) (chia sẽ tài nguyên) nên ta gọi OS = quản lý tài nguyên (resource manager) -> OS là phần mềm có nhiệm vụ : quản lý tài nguyên , thư viện chuẩn và máy ảo 
 
-### Tài Liệu Chuẩn & Tiêu Chuẩn Kỹ Thuật (Documentation & Standards)
-* **POSIX.1-2017 Specification**: Quản lý bộ nhớ và lời gọi hệ thống cấp thấp (`brk`, `sbrk`, `mmap`).
-* **System V Application Binary Interface (AMD64 ABI)**: Khung Stack Frame, quy ước gọi hàm (Calling Conventions), thanh ghi và Alignment.
-* **C++20 Standard Reference (cppreference.com)**: `std::unique_ptr`, `std::move`, Value Categories (`lvalue`/`rvalue`), Storage Duration.
+# II/ Ảo hóa CPU (Virtualizing the CPU)
 
-### Hướng Dẫn Công Cụ Chẩn Đoán (Diagnostic Tooling Manuals)
-* **GNU Debugger (GDB)**: Kiểm tra ô nhớ (`x/gx`), Hardware Watchpoints (`watch`), kiểm tra thanh ghi (`layout reg`).
-* **AddressSanitizer (ASan) & LeakSanitizer (LSan)**: Các cờ biên dịch và Runtime Environment Variables.
+- Bằng việc dùng một số thiết bị phần cứng (hardware devices) mà OS tạo ra ảo giác biến 1 CPU (hay 1 tập hợp nhỏ) thành vô số CPUs , gọi đó là Ảo hóa CPU (đơn nhiên ta phải dùng APIs để ưu cầu OS thực hiện các thao tác với các CPU ảo này - APIs là mà OS giúp chúng ta đơn giản hóa thao tác) . Và có nhiều câu hỏi nãy sinh sẽ được trả lời bằng các luật (policy) và cơ chế (mechanisms) (quản lý các cpu ảo = quản lý tài nguyên = OS)
 
----
+# III/ Ảo hóa bộ nhớ (Virtualizing Memory)
 
-## 3. Theo Dõi Nhận Thức & Năng Lực (Understanding Tracker)
+- Trước tiên bộ nhớ vật lý vô cùng đơn giản : Dãy các bytes , ta đọc dữ liệu nếu có địa chỉ và viết (hoặc cập nhật) bộ nhớ thông qua địa chỉ được cho
+Ảo hóa bộ nhớ là việc đưa cho mỗi tiến trình xử lý một địa chỉ ảo (thực tế là bộ nhớ vật lý đang được chia sẽ nhưng đảm bảo không đè nhau mà hỏng)
 
-### Tôi Đã Hiểu Gì? (What Do I Understand?)
+# IV/ Tính đồng thời (Concurrency)
 
-### Tôi Có Thể Giải Thích Gì? (What Can I Explain?)
+-Tính đồng thời là một trong những vấn đề lớn không chỉ trong OS mà hiện nay còn là đa luồng . Khi OS phải chạy quá trình đầu tiên , thứ hai , v.v sẽ xảy ra các lỗi và sự bất thống nhất . Lấy ví dụ việc lập loops và nâng biến đếm cnt , lỗi ở đâu . Lý do nằm ở việc nâng biến đếm bản chất gồm ba thao tác : Đọc thông tin từ bộ nhớ , Ghi lại giá trị và Ghi lại vào địa chỉ bộ nhớ . Nhưng ba hành động này không diễn ra đồng thời lập tức nên những điều kỳ lạ diễn ra
 
-### Tôi Có Thể Xây Dựng Gì? (What Can I Build?)
-- Thiết lập môi trường phát triển C++20 cơ bản trên Linux/WSL2 với GCC/Clang và CMake.
+# V/ Tính kiên trì (Persistence)
 
-### Tôi Còn Thắc Mắc Gì? (What Still Confuses Me?)
+-Dữ liệu rất dễ thất thoát , đặc biệt khi DRAM lưu dữ liệu theo phương pháp bay hơi , một sự có như sự cố hệ thống hoặc sập nguồn là mất mát mà không ai mong muốn . Vì vậy ta cần cả phần cứng và mềm của máy tính lưu thiết bị một cách kiên trì . Phần cứng như các thiết bị I/O , ổ đĩa cứng (hay gần đây là ổ đĩa rắn) chịu trách nhiệm cho các thông tin lâu dài (long lived inf) 
 
----
-
-## 4. Yêu Cầu Bằng Chứng Học Tập (Learning Evidence Requirements)
-
-| Danh Mục (Category) | Thành Phần Cần Hoàn Thành (Required Artifacts) | Trạng Thái (Status) |
-| :--- | :--- | :--- |
-| **Ghi Chú Kỹ Thuật (Technical Notes)** | `docs/memory-layout-amd64.md` (Bố cục bộ nhớ ELF, Không gian địa chỉ ảo, Ranh giới User/Kernel)<br>`docs/raii-and-ownership.md` (Nguyên lý RAII, Quyền sở hữu tài nguyên và Smart Pointers) | Chưa Bắt Đầu (*Not Started*) |
-| **Thực Nghiệm Lập Trình (Experiments)** | `experiments/stack-vs-heap/` (Quan sát chiều phát triển Stack và Heap)<br>`experiments/linker-errors/` (Kiểm tra Bảng ký hiệu Symbol Table qua `nm`/`objdump`) | Chưa Bắt Đầu (*Not Started*) |
-| **Đồ Án Cột Mốc (Milestone Projects)** | `projects/multi-module-cli/` (Dự án C++20 CLI Utility đa module quản lý bằng CMake - Phase 0 Milestone) | Chưa Bắt Đầu (*Not Started*) |
-| **Bài Lab & Benchmark** | `benchmarks/smart-pointer-overhead/` (Đo đạc chi phí chênh lệch thời gian giữa raw pointer, `unique_ptr`, `shared_ptr`) | Chưa Bắt Đầu (*Not Started*) |
-
----
-
-## 5. Câu Hỏi Mở & Giả Thuyết Nghiên Cứu (Open Research Questions)
-
-1. **Bộ Nhớ (Memory):** Khi đối tượng `std::unique_ptr` bị tiêu hủy, lệnh `delete` bên dưới sẽ gọi lời gọi hệ thống `brk()` / `sbrk()` ngay lập tức hay trả bộ nhớ về cho User-Space Allocator (`glibc ptmalloc`) quản lý?
-2. **Công Cụ (Toolchain):** Làm thế nào trình biên dịch (GCC/Clang) tối ưu hóa loại bỏ hoàn toàn chi phí trừu tượng (*Zero-Overhead Abstraction*) của `std::unique_ptr` để tạo ra mã Assembly tương đương con trỏ thô?
-3. **Liên Kết (Linker):** Sự khác biệt về bản chất giữa Static Linking (`.a`) và Dynamic Linking (`.so`) ảnh hưởng thế nào đến kích thước tệp thực thi và địa chỉ bộ nhớ khi nạp chương trình?
-4. **Chuẩn C++ (Language Standard):** Tại sao việc sử dụng `raw new/delete` lại bị coi là Anti-Pattern trong lập trình C++ hiện đại và trong các hệ thống đòi hỏi tính an toàn cao?
-
----
+- Phần mềm chịu trách nhiệm đó gọi là tệp tin hệ thống (file system) . Khác với CPU hay RAM , nó đã là một tầng trựu tượng của OS (không cần qua ảo hóa của OS) vì giả sử nhu cầu thiết yếu của người dùng là chia sẽ file (ta không thể viết code tren editor , rồi biên dịch bằng gcc rồi chạy file nếu ảo hóa và tách ra thành từng file system riêng , điều đó rất khó hoặc bất khả thi) . Phổ biến là dùng các lời gọi hệ thống định tuyến đến tệp tin hệ thống  
+ 
+- Cách tệp tin hệ thống ghi dữ liệu :
++ Xác định vị trí dữ liệu sẽ nằm đâu và giữ quan sát thông qua nhiều cấu trúc dữ liệu khác nhau do tệp tin hệ thống duy trì . Để làm được việc này thì tệp tin hệ thống phải liên tục yêu cầu các thao tác I/O tới thiết bị dưới nhằm đọc các cấu trúc đang tồn tại hoặc viết (hoặc cập nhật) . Các thao tác này được đơn giản hóa nhờ OS thông qua lời gọi hệ thống (OS = thư viện chuẩn) (nếu tự tay thực hiện thì việc này vô cùng khó đòi hỏi sự tỉ mĩ và phức tạp với hiểu biết về thiết bị low-level và ngữ nghĩa (exact semantics)) 
