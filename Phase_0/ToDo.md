@@ -13,3 +13,7 @@
 - [X] Đọc và hiểu sơ bộ về Concurrency
 - [X] Đọc và hiểu sơ bộ về Persistence
 - [X] Tự code và kiểm tra sơ bộ về Concurrency thông qua đa luồng
+
+# Day 003 : How to build OS 
+- [X] Đọc và hiểu sơ bộ tài liệu về việc đặt mục tiêu xây dựng OS 
+- [X] Đọc và hiểu sơ bộ về lịch sử và quá trình phát triển
