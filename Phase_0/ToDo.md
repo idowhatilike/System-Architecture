@@ -17,3 +17,9 @@
 # Day 003 : How to build OS 
 - [X] Đọc và hiểu sơ bộ tài liệu về việc đặt mục tiêu xây dựng OS 
 - [X] Đọc và hiểu sơ bộ về lịch sử và quá trình phát triển
+
+# Day 004 : The abstraction : process
+- [X] Đọc và hiểu sơ bộ về cách OS tạo và vận hành tiến trình 
+- [X] Hoàn thành 8 bài tập cpu-intro (9.67 / 10)
+- [X] Học và code & test 3 API cơ bản : Fork , Wait , Exec
+

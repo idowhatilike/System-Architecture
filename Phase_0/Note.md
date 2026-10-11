@@ -1,3 +1,6 @@
+# Các lưu ý Phase 0 :
++ I/O là nhập xuất từ thiết bị nhưng việc CPU vẫn tham gia vào việc bắt đầu (bằng system call) và kết thúc (nhận dữ liệu và chuyển đổi trạng thái)
+
 # Day 002 : Introducion to OS (9 / 10 / 2026)
 
 ---
@@ -62,3 +65,39 @@ Và phần mền (software) chịu trách nhiệm khiến dễ dàng chạy chư
 + Wait : Cho một tiến trình chờ một tiến trình khác thực hiện
 + Status : Tra cứu thông tin và trạng thái
 + Miscellaneous Control : Các thao tác bổ sung (ví dụ : suspend - đình chỉ tiến trình , resume : tiếp tục tiến trình)
+
+# Day 004 : 11 / 10 / 2026
+
+## I / Bước khởi tạo tiến trình 
+
+- Để chạy chương trình thì OS cần nạp (load) các đoạn mã (lúc này dạng mã thực thi chứ không phải ở dạng mã nguồn) (code) và dữ liệu tĩnh (static data : biến toàn cục (initialized variables , ...)) từ ổ đĩa (disk) sang bộ nhớ (memory) cụ thể là không gian địa chỉ (address space) (chương trình nằm ở ổ đĩa cứng (hoặc flash SSD) dưới dạng file thực thi)
+- Có hai kiểu nạp : Eager loading (Nạp trước theo một chiến lược đã chọn - ví dụ như nạp tất cả) và Lazi loading (Nạp những đoạn mã và dữ liệu cần thiết) (cần hiểu rõ cơ chế paging và swapping)
+- Sau khi đã nạp dữ liệu , OS cần phải làm một số việc . Tiêu biểu là cấp phát bộ nhớ cho ngăn xếp thực thi (run-time stack hay stack) (stack chứa dữ liệu các biến cục bộ , tham số hàm , địa chỉ trả về ...) và heap (ví dụ heap trong C có tác dụng để cấp phát / xóa dữ liệu động một cách tường minh) . Hay liên quan đến I/O thì Unix/Linux khi mở một file sẽ có các file mô tả (file descriptor ví dụ như : standard inp , standard out , standard error , ..) .Sau khi hoàn thành các công đoạn , bước chính cuối cùng của OS chính là thông qua cơ chế chuyên biệt mà nhảy đến điểm bắt đầu chương trình (entry point)
+
+## II / Các trạng thái của quy trình (Process States)
+
+- Để đơn giản hóa ta chỉ xét ba trạng thái cơ bản của một quy trình bao gồm : Sẵn sàng (Ready - Sẵn sàng để chạy nhưng chưa chạy) , Đang thực thi (Running - Đang chạy) và Tạm gác (Blocked - Đang chờ các sự kiện hoặc thực hiện các lệnh khiến tiến trình chưa thể chạy tiếp cho đến khi hoàn thành các lệnh để về Ready)
+- Mối quan hệ : Ready --(được xếp lịch - scheduled)> running --(chuẩn bị I/O - I/O initate) --(hoàn tất I/O)> ready và running --(bị hủy bỏ - Descheduled)> ready
+
+## III / Các cấu trúc dữ liệu (Data structes)
+
+- OS cần các cấu trúc dữ liệu quan trọng để theo dõi các trạng thái của quy trình ví dụ như danh sách hoặc thông tin cần thiết của các quy trình sẵn sàng , đang chạy hay đang bị Tạm gác . Khi bị gác các thanh ghi chứa nội dung của tiến trình sẽ lưu vào các vùng lưu ngữ cảnh (register context - trên bộ nhớ) và khi hoàn tất và OS muốn tiếp tục tiến trình chỉ cần đặt đúng giá trị các thanh ghi về giá trị vật lý thực tế (liên quan đến context switch) (Và ngoài ra còn có các trạng thái khác của tiến trình : Khởi tạo (inital) hay Cuối cùng (Zombie - tiến trình đã xong nhưng chưa xóa nhằm cung cấp thông tin cho trạng thái cha - parent process) , ...) .
+- Thông tin thêm : Cấu trúc đơn lẻ để lưu tiến trình thường được gọi là Khối điều khiển tiến trình (Process Controll Block - PCB - chỉ là một struct)
+
+## IV / Giao diện lập trình chuyển tiếp (Interlude : Process API)
+
+- Có thể hiểu đơn giản API là lớp giao diện trừu tượng hóa cách sử dụng chức năng nhưng không nhất thiết do OS cung cấp
+
+### a. API lời gọi hệ thống tạo tiến trình mới - fork()
+
+- Fork là một lệnh gọi hệ thống tạo ra một tiến trình mới  gần như là nhân bản của tiến trình hiện tại (gọi là cha) và tiến trình mới (gọi là con) không bắt đầu tại main mà entry point của nó là sau vị trí hàm fork trong cha (tức thực thi tại điểm mà lời gọi fork) ? Và trạng thái của 2 tiến trình này là khác nhau , nhất là giá trị fork trả về khi con chỉ trả về 0 còn cha thì là pid của con để xử lý hai luồng thực thi riêng biệt (xử lý từ fork đến tiếp). Ở đây có một vấn đề thú vị là sự đồng thời - liệu tiến trình nào sẽ thực thi trước ? ":3"
+
+### b. API lời gọi hệ thống ép tiến trình chờ đợi - wait()
+
+- Ta dùng wait để tiến trình cha thực thi khi và chỉ khi tiến trình con đã xong , sau đó tiến trình cha mức thực thi các lệnh sau và dưới wait
+(Đôi khi wait được trả về trước khi tiến trình con thực sự hoàn thành)
+(Không bao giờ khẳng định tính đúng đắn tuyệt đối thiếu chứng minh :3)
+
+### c. API lời gọi hệ thống thực thi tiến trình khác - exec()
+
+- Ta dùng fork để tạo và chạy 1 tiến trình gần như là bản sao , còn exec dùng để chạy 1 tiến trình khác (thứ mà thực sự chúng ta hay dùng)
