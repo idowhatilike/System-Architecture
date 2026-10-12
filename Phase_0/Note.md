@@ -1,5 +1,6 @@
 # Các lưu ý Phase 0 :
 + I/O là nhập xuất từ thiết bị nhưng việc CPU vẫn tham gia vào việc bắt đầu (bằng system call) và kết thúc (nhận dữ liệu và chuyển đổi trạng thái)
++ Read = Fd -> buffer , Write = Buffer -> fd
 
 # Day 002 : Introducion to OS (9 / 10 / 2026)
 
@@ -66,7 +67,7 @@ Và phần mền (software) chịu trách nhiệm khiến dễ dàng chạy chư
 + Status : Tra cứu thông tin và trạng thái
 + Miscellaneous Control : Các thao tác bổ sung (ví dụ : suspend - đình chỉ tiến trình , resume : tiếp tục tiến trình)
 
-# Day 004 : 11 / 10 / 2026
+# Day 004 + 005 : 11 / 10 / 2026 + 12 / 10 / 2026
 
 ## I / Bước khởi tạo tiến trình 
 
@@ -90,14 +91,23 @@ Và phần mền (software) chịu trách nhiệm khiến dễ dàng chạy chư
 
 ### a. API lời gọi hệ thống tạo tiến trình mới - fork()
 
-- Fork là một lệnh gọi hệ thống tạo ra một tiến trình mới  gần như là nhân bản của tiến trình hiện tại (gọi là cha) và tiến trình mới (gọi là con) không bắt đầu tại main mà entry point của nó là sau vị trí hàm fork trong cha (tức thực thi tại điểm mà lời gọi fork) ? Và trạng thái của 2 tiến trình này là khác nhau , nhất là giá trị fork trả về khi con chỉ trả về 0 còn cha thì là pid của con để xử lý hai luồng thực thi riêng biệt (xử lý từ fork đến tiếp). Ở đây có một vấn đề thú vị là sự đồng thời - liệu tiến trình nào sẽ thực thi trước ? ":3"
+- Fork là một lệnh gọi hệ thống tạo ra một tiến trình mới  gần như là nhân bản của tiến trình hiện tại (gọi là cha) và tiến trình mới (gọi là con) không bắt đầu tại main mà entry point của nó là sau vị trí hàm fork trong cha (tức thực thi tại điểm mà lời gọi fork) ? Và trạng thái của 2 tiến trình này là khác nhau , nhất là giá trị fork trả về khi con chỉ trả về 0 còn cha thì là pid của con để xử lý hai luồng thực thi riêng biệt (xử lý từ fork đến tiếp). Ở đây có một vấn đề thú vị là sự đồng thời - liệu tiến trình nào sẽ thực thi trước ? ":3" (Có thể hiểu là khi sao chép ta sao chép mọi thứ không chỉ mã nguồn mà 
+dữ liệu stack , heap , ... và cả thanh ghi program counter - pc chỉ báo cho CPU cần thực hiện gì nên tiến trình con sẽ chạy từ sau fork do pc con sao chép cha tức là tính sau fork) (trên máy mình thì cha thường sẽ nhanh hơn con tý - khá hợp lý , cha gọi fork xong đi trước rồi tiến trình con mới tạo xong và đuổi theo)
 
 ### b. API lời gọi hệ thống ép tiến trình chờ đợi - wait()
 
 - Ta dùng wait để tiến trình cha thực thi khi và chỉ khi tiến trình con đã xong , sau đó tiến trình cha mức thực thi các lệnh sau và dưới wait
 (Đôi khi wait được trả về trước khi tiến trình con thực sự hoàn thành)
 (Không bao giờ khẳng định tính đúng đắn tuyệt đối thiếu chứng minh :3)
+- Hàm chuẩn là pid_t wait(int *wstatus) trong đó wstatus trả về con trỏ giá trị thoát của tiến trình con , nếu chúng ta chỉ muốn đình chỉ tiến trình cha thì dùng nullptr , khai báo wstatus và ta có waitpid(pid_t pid,int *wstatus,0 (options - thay đổi hành vi)) trong đó pid có 4 giá trị (< -1 , -1 , 0 , > 0 , RTFM :3) xác định tập các tiến trình con thực thi cần chờ đợi , có :
+            waitpid(-1 , &wstatus , 0) = wait(&wstatus)
 
 ### c. API lời gọi hệ thống thực thi tiến trình khác - exec()
 
 - Ta dùng fork để tạo và chạy 1 tiến trình gần như là bản sao , còn exec dùng để chạy 1 tiến trình khác (thứ mà thực sự chúng ta hay dùng)
+
+- Chi tiết về exec . Khi thực thi chương trình qua exec , có thể hiểu như ta đang gõ 1 prompt bằng code . Khi đó cần truyền các arg (args) , có 2 kiểu là liệt kê hoặc qua vector (thông qua 2 chữ l hoặc v) , nhưng không quan trọng kiểu thì cuối cùng phải có nullptr , chữ cuối là p , e hoặc rỗng tương ứng là rỗng thì chuyền chuẩn xác link file nhị phân , còn p thì tìm trong PATH còn e thì chỉ đơn giản là cho truyền biến môi trường
+
+### d. Tại sao lại như vậy ?
+
+- Cơ chế của fork và exec hay wait cực kỳ đơn giản nhưng rất mạnh để tạo nên những tiến trình hữu ích . Và hãy đọc thêm man page (RTFM - F bổ sung ^-^)

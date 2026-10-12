@@ -23,3 +23,6 @@
 - [X] Hoàn thành 8 bài tập cpu-intro (9.67 / 10)
 - [X] Học và code & test 3 API cơ bản : Fork , Wait , Exec
 
+# Day 005 : Pratice API process
+- [X] Đọc man wait , exec
+- [X] Hoàn thành (và mở rộng) các vấn đề của Interlude : the process API

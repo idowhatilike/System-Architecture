@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.16)
 
-project(TesExecExample CXX)
+project(I_5_8 CXX)
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-add_executable(texec TestExec.cpp)
+add_executable(i58 I_5_8.cpp)
