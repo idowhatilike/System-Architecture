@@ -24,5 +24,12 @@
 - [X] Học và code & test 3 API cơ bản : Fork , Wait , Exec
 
 # Day 005 : Pratice API process
-- [X] Đọc man wait , exec
+- [X] Đọc man wait , exec (và mở rộng)
+- [X] Tìm hiểu sơ bộ về pipe
+- [X] Tìm hiểu sơ bộ về cơ chế đóng mở FD
 - [X] Hoàn thành (và mở rộng) các vấn đề của Interlude : the process API
+
+# Day 006 : Mechanism: Limited Direct Execution
+- [X] Hiểu cơ chế switch context
+- [X] Hiểu cơ chế ảo hóa CPU
+- [X] Tính đồng thời khi xử lý , hiểu rõ hơn về procedure 

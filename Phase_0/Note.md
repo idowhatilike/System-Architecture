@@ -4,7 +4,7 @@
 
 # Day 002 : Introducion to OS (9 / 10 / 2026)
 
----
+_______________________________________________________________________
 
 ## I/ OS là gì và tác dụng
 
@@ -44,7 +44,11 @@ Và phần mền (software) chịu trách nhiệm khiến dễ dàng chạy chư
 - Cách tệp tin hệ thống ghi dữ liệu :
 + Xác định vị trí dữ liệu sẻ nằm đâu và giữ quan sát thông qua nhiều cấu trúc dữ liệu khác nhau do tệp tin hệ thống duy trì . Để làm được việc này thì tệp tin hệ thống phải liên tục yêu cầu các thao tác I/O tới thiết bị dưới nhằm đọc các cấu trúc đang tồn tại hoặc viết (hoặc cập nhật) . Các thao tác này được đơn giản hóa nhờ OS thông qua lời gọi hệ thống (OS = thư viện chuẩn) (nếu tự tay thực hiện thì việc này vô cùng khó đòi hỏi sự tỉ mĩ và phức tạp với hiểu biết về thiết bị low-level và ngữ nghĩa (exact semantics)) 
 
+_______________________________________________________________________
+
 # Day 003 : 10 / 10 / 2026
+
+_______________________________________________________________________
 
 ## I/ Xây dựng một hệ điều hành (OS) cần gì và lịch sử của hệ điều hành ?
 
@@ -67,7 +71,11 @@ Và phần mền (software) chịu trách nhiệm khiến dễ dàng chạy chư
 + Status : Tra cứu thông tin và trạng thái
 + Miscellaneous Control : Các thao tác bổ sung (ví dụ : suspend - đình chỉ tiến trình , resume : tiếp tục tiến trình)
 
+_______________________________________________________________________
+
 # Day 004 + 005 : 11 / 10 / 2026 + 12 / 10 / 2026
+
+_______________________________________________________________________
 
 ## I / Bước khởi tạo tiến trình 
 
@@ -111,3 +119,101 @@ dữ liệu stack , heap , ... và cả thanh ghi program counter - pc chỉ bá
 ### d. Tại sao lại như vậy ?
 
 - Cơ chế của fork và exec hay wait cực kỳ đơn giản nhưng rất mạnh để tạo nên những tiến trình hữu ích . Và hãy đọc thêm man page (RTFM - F bổ sung ^-^)
+
+_______________________________________________________________________
+
+# Day 006 : 14 / 10 / 2026 : Mechanism: Limited Direct Execution
+
+- Việc chia sẽ CPU cho dường như là vô số chương trình chạy cùng lúc là lúc ta cần ảo hóa CPU .
+- Đánh giá việc ảo hóa CPU dựa trên 2 tiêu chí : performance và retaining control
+
+_______________________________________________________________________
+
+## I/ Kĩ thuật cơ bản : Hạn chế thực thi trực tiếp (Limited Direct Execution - LDE Protocol) 
+
+- Hãy tưởng tượng việc không có hạn chế nào mà cứ để tiến trình chạy trực tiếp trên CPU , quá trình ấy bao gồm tạo điểm bắt đầu tiến trình , nạp dữ liệu , xác định và thiết lập bộ nhớ , ... rồi trả về nhân kernel . Nghe đơn giản và thực sự là tiến trình rất nhanh (vì không qua khâu trung gian nào) nhưng có hai hạn chế : Làm sao đảm bảo ta sẽ không thực hiện những thao tác ta không muốn ? Và làm sao để dừng tiến trình hiện tại để đổi sang tiến trình khác -> Khi đó OS không hơn không kém một thư viện cung cấp API , ta cần một sự "limited" 
+
+___________________________________________
+
+### a. Vấn đề 1 : Những thao tác bị hạn chế (Restricted Operations)
+
+#### Vấn đề đặt ra
+- Làm sao để tiến trình có thể thực thi các thao tác I/O hoặc các thao tác bị hạn chế khác nhưng không cần được cấp quyền hoàn toàn trên toàn bộ hệ thống ?
+- Nếu system call và procedure call giống nhau vậy thì làm sao phân biệt ?
+- Vậy kernel-mode có những hạn chế nào cần thiết hay không ?
+- Điều gì sẽ xảy ra nếu bạn có quyền tạo và thay đổi Trap table trong user-mode ?
+
+#### Giải quyết câu hỏi 1
+- Sử dụng cơ chế chuyển đổi quyền điều khiển bảo vệ (PROTECTED CONTROL TRANSFER) . Thông qua sự giúp đỡ của phần cứng thông qua hai chế độ : user-mode và kernel-mode với việc chuyển đổi trap và return-from-trap (OS cho phần cứng biết trap tables nằm đâu trong bộ nhớ).
+
+- User mode : Yêu cầu thực thi lệnh không phù hợp -> Kill process . Yêu cầu thực thi lệnh bị hạn chế -> Dùng lệnh trap để nhảy tới nhân kernel và đưa quyền lên kernel mode , lúc này OS xử lý các lệnh rồi thông qua lệnh return-from-trap về user-mode . Phần cứng phải đảm bảo khi thực thi trap phải lưu trữ đủ các thanh ghi tiến trình hiện tại vào Kernel stack để lệnh return-from-trap biết trạng thái đúng cần quay về
+
+#### Giải quyết câu hỏi 2 
+- Để phân biệt system call và procedure thật ra rất đơn giản , lấy ví dụ write() hay open() trong C , khi gọi hàm thì tiến trình làm hai việc : Báo tên (chỉ số) việc cần làm ; Kích hoạt lệnh Trap . Còn procedure call thường chỉ nhảy đến đoạn code khác trong cùng user-mode (tức trong cùng một address space) , và không chứa lệnh trap
+
+#### Giải quyết câu hỏi 3 (và 4)
+- Vì ở user-mode quyền hạn bị hạn chế và tiến trình bị nhốt ở căn phòng ảo (địa chỉ không gian) nên ta được thoải mái nhảy nhưng kernel-mode nếu không cẩn thận sẽ gây ra lỗ hổng bảo mật . Khi chuyển từ User-mode sang Kernel-mode thì sự khác biệt về quyền hạn sẽ thay đổi hành vi của OS đối với quyền truy cập và thao tác với CPU
+- Khi một sự kiện ngoại lệ xảy ra (như ngắt nguồn phần cứng , system call , ...) thì phần cứng sẽ nhìn vào Bảng bẫy (Trap Table - thứ được tạo và điều chỉnh ngay lúc khởi động máy (boot up) bởi kernel vì khi đó máy sẽ ở kernel-mode) để biết địa chỉ Xử lý bẫy (Trap handler - cũng được tạo lúc bật và nằm trong RAM - thường là một đoạn code) để xử lý (làm gì , file nào , ...)
+- Đương nhiên chỉ kernel-mode thao tác lên trap table (và bất khả thi ở user-mode để thao tác lên trap table dù là thông qua system call) . Còn nếu được thì đơn giản chiếm máy là khả thi 
+
+___________________________________________
+
+### b. Vấn đề 2 : Quá trình chuyển đổi giữa các tiến trình
+
+- Quá trình đơn giản là dừng tiến trình đang thực thi và chạy một tiến trình khác . Nghe đơn giản nhỉ , nhưng vấn đế lúc này là theo lý thuyết OS đang không chạy trên CPU mà là tiến trình , vậy thì làm sao mà OS thực hiện việc chuyển đổi , về cơ bản OS không làm được nếu OS không chạy trên CPU 
+
+
+#### Vấn đề đặt ra :
+- Làm sao OS đoạt quyền kiểm soát CPU ?
+- Làm sao OS đoạt quyền kiểm soát khi tiến trình không trả quyền ?
+- OS sẽ làm gì tiếp khi đã có quyền kiểm soát trở lại và lưu giá trị tiến trình để thay đổi như nào ?
+- Làm sao để đổi từ tiến trình A -> B đúng ?
+- Mất bao lâu để switch A và B ?
+
+#### Giải quyết vấn đề 1
+- Cách giải quyết cổ điển (trong các OS cũ) là quan hệ đối tác (cooperative) tức OS sẽ tin tưởng vào tiến trình chạy hợp lý , nếu tiến trình chạy quá lâu và tốn tài nguyên thì tự nguyện cho OS sẽ đoạt lại quyền kiểm soát CPU . OS sẽ chiếm lại quyền thông qua một loạt các system call chỉ có tác dụng chuyển quyền kiểm soát từ tiến trình -> OS hoặc tiến trình có những hành vi bất hợp pháp (chia cho 0 , tiếp cận bộ nhớ không được phép , ...) rồi OS đoạt quyền và kill process (Cách giải quyết thụ động và nhiều tình huống dẫn đến OS sẽ không bao giờ có được quyền) . NHƯNG nếu tiến trình rơi vào việc thực thi quá lâu mà không có sự hỗ trợ phần cứng khiến tiến trình không gọi các sys call cần thiết thì OS bất lực và chỉ còn :3 đơn nhiên là restart
+(Cách OS đối phó với hành vi bất hợp lệ : Chấm dứt chương trình - thô bạo , đơn giản nhưng đủ hiệu quả)
+
+#### Giải quyết vấn đề 2
+- Cách giải quyết chủ động và hiệu quả hơn chính là : Ngắt bởi bộ hẹn giờ (timer interrupt) . Đơn giản là một bộ đếm sẽ được lập trình để ngắt chương trình hiện tại mỗi vài milis và trình xử lý ngắt (interrupt handler) trong OS sẽ chạy và xong . 
+OS cần báo cho phần cứng biết mỗi lần khởi động lại cần làm gì , và đồng thời khi khởi động OS cần bật lại bộ hẹn giờ , cả hai đều là hoạt động đặc quyền (privileged operation) -> OS cảm thấy an toàn và chạy tiến trình nào cũng được (đôi khi bộ đếm có thể bị tắt) (Phần cứng chịu trách nhiệm quan trọng lưu đủ thông tin trạng thái đặc biệt là cho trap và return-from-trap)
+- Khi ngắt thì thông tin tiến trình (A) sẽ được lưu vào kernel stack (A) và chuyển sang kernel-mode
+
+#### Giải quyết vấn đề 3
+- Khi có quyền kiểm soát , OS đối mặt với hai câu hỏi : Tiếp tục hay tiến trình mới . Câu trả lời thông qua một phần của OS là Bộ lịch (Scheduler - một policy) . Nếu lựa chọn là thay đổi , OS sẽ thực thi một đoạn mã nguồn mà ta hay gọi là chuyển đổi bối cảnh (context - switch) : lưu dữ liệu tiến trình hiện tại (các giá trị thanh ghi) và con trỏ kernel stack A , ... vào bộ nhớ quản lý của A và nạp của tiến trình sắp chạy lên
+
+#### Giải quyết vấn đề 4
+- Ta cần một phương pháp đủ đơn giản để đổi từ A -> B mà đồng thời chỉnh từ kernel-mode -> user-mode , vâng đó chính là return-from-trap . OS chỉ cần lưu giá trị của A lại và lấy giá trị của B (bằng cách đổi kernel stack A -> B) sau đó dùng lệnh return-from-trap , lệnh này sẽ lấy đỉnh dữ liệu tiến trình Kernel stack và chuyển qua user-mode 
+Ví dụ : (Bộ nhớ quản lý là 1 proc_struct của tiến trình nào đó)
+A thực thi -> Ngắt (regs(A) -> k-stack(A) ; user-mode -> kernel-mode ; trap -> Xử lý trap)
+Trap handler : OS sẵn sàng và gọi switch(A,B) ; regs(A) -> proc_struct(A) ; regs(B) <- proc_struct(B) ; k-stack(A) -> k-stack(B) ;
+return-from-trap (đi vào B) : regs(B) <- k-stack(B) ; kernel-mode -> user-mode ; ...
+- Note quan trọng :
++ Sở dĩ 2 lần lưu regs -> kstack và proc là vì regs->kstack lưu user-mode và còn lại lưu cho kernel-mode 
++ Mỗi tiến trình có 1 kstack riêng và không hề có kernel stack chung nào cả
++ Có 2 kiểu lưu/khôi phục thanh ghi là : Ngắt đếm thời gian , thanh ghi người dùng được phần cứng lưu ngầm định vào kstack của tiến trình đó . Thứ hai là khi OS quyết định chuyển từ A->B thì lưu một cách minh bạch vào cấu trúc tiến trình và hoạt động như thể vừa mới trap vào kstack B chứ không phải trap kstack A . Giải thích kỹ : trap = user-mode -> kernel-mode = đi vào kstack còn return-from-trap là kernel-mode->user-mode bằng việc lấy dữ liệu từ kstack 
+
+
+#### Giải quyết vấn đề 5
+- Thử dùng Imbench
+- Ví dụ như : (1996 , Linux 1.3.37 , 200 MHz P6 CPU) -> (Sys cal : 4 us ; context switch : 6 us)
+
+___________________________________________
+
+## II / Vấn đề Tính đồng thời
+
+___________________________________________
+
+### Đặt ra vấn đề 
+- Trong lúc thực thi một lệnh gọi hệ thống thì ngắt thời gian xảy ra , hay một cú ngắt đang diễn ra trong lúc một cú ngắt khác thì chuyện gì sẽ xảy ra ? -> Vấn đề tính đồng thời
+
+### Giải quyết câu hỏi 
+- Nó thuộc về tính đồng thời , sau này ta sẽ học rõ . Nhưng nói đơn giản là OS dùng một cơ chế đơn giản là vô hiệu hóa ngắt khi có một tiến trình ngắt đang hoạt động (nhưng nếu bỏ lâu thì sẽ mất ngắt - điều thực sự rất tồi tệ) . Hiện nay các OS đã phát triển một sơ đồ cơ chế khóa phức tạp bảo về truy cập đồng thời nội bộ , thứ rất hữu ích cho phép nhiều hoạt động diễn ra trên kernel cùng lúc
+
+___________________________________________
+
+## III / Tổng kết chương 
+
+___________________________________________
+
+- Tập hợp các kỹ thuật để ảo hóa CPU chính là Limited Direct Execution - LDE . Ý tưởng cơ bản là cứ cho tiến trình chạy trực tiếp trên CPU nhưng có những thiết lập phần cứng đảm bảo giới hạn những gì tiến trình có thể làm và tài nguyên sử dụng . OS thiết lập trap (trap table , trap hander , ...) và các thư viện đính kém vào procedure (và chúng ta gọi procedure của các thư viện , có thể là OS) và bật bộ đếm giờ và hướng dẫn cho phần cứng "việc cần làm" khi gặp trường hợp "cần làm" . Bằng một cơ chế đoạt quyền đã cài , OS sẽ chiếm lại quyền đã cho một tiến trình thực thi trực tiếp trên CPU , rồi dựa vào Policy mà chọn hành động tiếp theo . Nếu đổi tiến trình sẽ lưu trạng thái user-mode và kernel-mode xong dùng đổi địa chỉ kernel stack và return-from-trap để đổi tiến trình . OS cũng cần đảm bảo một cơ chế xử lý khi các sys call xảy ra đồng thời 
