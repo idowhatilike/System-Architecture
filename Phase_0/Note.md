@@ -189,6 +189,7 @@ A thực thi -> Ngắt (regs(A) -> k-stack(A) ; user-mode -> kernel-mode ; trap 
 Trap handler : OS sẵn sàng và gọi switch(A,B) ; regs(A) -> proc_struct(A) ; regs(B) <- proc_struct(B) ; k-stack(A) -> k-stack(B) ;
 return-from-trap (đi vào B) : regs(B) <- k-stack(B) ; kernel-mode -> user-mode ; ...
 - Note quan trọng :
++ Để đổi stack tiến trình đang dùng thì ta dùng con trỏ stack - Stack Pointer
 + Sở dĩ 2 lần lưu regs -> kstack và proc là vì regs->kstack lưu user-mode và còn lại lưu cho kernel-mode 
 + Mỗi tiến trình có 1 kstack riêng và không hề có kernel stack chung nào cả
 + Có 2 kiểu lưu/khôi phục thanh ghi là : Ngắt đếm thời gian , thanh ghi người dùng được phần cứng lưu ngầm định vào kstack của tiến trình đó . Thứ hai là khi OS quyết định chuyển từ A->B thì lưu một cách minh bạch vào cấu trúc tiến trình và hoạt động như thể vừa mới trap vào kstack B chứ không phải trap kstack A . Giải thích kỹ : trap = user-mode -> kernel-mode = đi vào kstack còn return-from-trap là kernel-mode->user-mode bằng việc lấy dữ liệu từ kstack 
@@ -217,3 +218,31 @@ ___________________________________________
 ___________________________________________
 
 - Tập hợp các kỹ thuật để ảo hóa CPU chính là Limited Direct Execution - LDE . Ý tưởng cơ bản là cứ cho tiến trình chạy trực tiếp trên CPU nhưng có những thiết lập phần cứng đảm bảo giới hạn những gì tiến trình có thể làm và tài nguyên sử dụng . OS thiết lập trap (trap table , trap hander , ...) và các thư viện đính kém vào procedure (và chúng ta gọi procedure của các thư viện , có thể là OS) và bật bộ đếm giờ và hướng dẫn cho phần cứng "việc cần làm" khi gặp trường hợp "cần làm" . Bằng một cơ chế đoạt quyền đã cài , OS sẽ chiếm lại quyền đã cho một tiến trình thực thi trực tiếp trên CPU , rồi dựa vào Policy mà chọn hành động tiếp theo . Nếu đổi tiến trình sẽ lưu trạng thái user-mode và kernel-mode xong dùng đổi địa chỉ kernel stack và return-from-trap để đổi tiến trình . OS cũng cần đảm bảo một cơ chế xử lý khi các sys call xảy ra đồng thời 
+
+___________________________________________
+
+# Day 007 : 
+
+
+___________________________________________
+
+## I / Kết quả bài tập Mechanism LDE 
+
+- gettimeoffday() = thời gian tính từ mốc 1970 , gồm 2 giá trị : Thời gian theo s và thời gian theo us
+(có thể bị tác động bởi chênh lệch thời gian thì OS hiệu chỉnh)
+- steady_clock() của chrono : đếm trực tiếp trên CPU nên chính xác hơn gettimeoffday
+
+___________________________________________
+
+## II / RAII 
+
+- Thu thập tài nguyên khi khởi tạo (Resource Acquisition Is Initialization - RAII) là một cơ chế thiết kế nhằm quản lý (quyền sở hữu) tài nguyên theo vòng đời (scope , ...) . Đóng gói các tài nguyên vào một class RAI (Constructor xin tài nguyên , Destructor nhả) và ép buộc phải dùng thông qua biến tự động (object) của class RAII 
+- Ý tưởng cốt lõi : Khởi tạo đối tượng (dùng construction - Xin và tiếp nhận quyền quản lý tài nguyên) ->
+sử dụng tài nguyên -> Hủy đối tượng (dùng destruction - Giải phóng các tài nguyên đã xin và tiếp nhận)
++ Construction = Hàm khởi động ngay khi đối tượng (obj) được khởi tạo nhằm kiểm tra các tài nguyên cần thiết , nếu thất bại và ném về ngoại lệ thì đối tượng bị hủy bỏ , các tài nguyên đã xin được cũng trả lại (nhưng nếu tài nguyên trong thân construction - tức tài nguyên thủ công do ta tự đặt vào vẫn có thể bị rò rỉ)
++ Destruction = Hàm được trình biên dịch tự động chèn vào điểm kết thúc vòng đời (scope , return , break , throw , ... bất kỳ điều gì kết thúc vòng đời đối tượng đó) dùng để giải phóng tài nguyên dù cho có thoát scope sớm (nếu gặp sự cố destruction không xử lý được như ném ngoại lệ lúc stack unwinding -> std::terminate) .
++ Khi rời khỏi chương trình hoặc tháo gỡ stack (stack unwinding) các biến cục bộ sẽ bị giải phóng ngược quá trình khởi tạo (ví dụ là khởi tạo sẽ chèn lên đỉnh stack thì sẽ bốc ngược lại , có thể không phải stack nhưng đảm bảo tính ngược lại với quá trình khởi tạo)
++ RAII là một tư duy thiết kế hệ thống , ví dụ như Rule of Five gồm 5 điều cần quan tâm khi thiết kế bất cứ điều gì : Destruction , Copy/Move construction , Copy/Move assignment operato . RAII rất mạnh nhưng không đảm bảo 100% và nó chỉ quản lý tài nguyên chứ không đảm bảo tài nguyên đó thực hiện đúng quá trình khi gặp sự cố
++ unique_ptr và shared_ptr là 2 con trỏ áp dụng RAII rất rõ : unique_ptr - chỉ duy nhất 1 biến sở hữu , giải phóng biến địa chỉ đó thì bộ nhớ giá trị đó cũng đi còn shared_ptr chỉ giải phóng khi toàn bộ biến con trỏ cùng shared con trỏ đó đã được giải phóng 
++ Ta hạn chế copy vì tài nguyên sử dụng thường là lớn và cùng một địa chỉ gây phức tạp quá trình , nên dùng move để đổi chuyển giao quyền sở hữu và trách nhiệm dọn dẹp từ a -> b
+- Không phải mọi tài nguyên đều có thể tuân theo RAII ví dụ như : thời gian xử lý CPU , lượng điện tiêu thụ , ... , tức RAII không thể quản lý quyền sở hữu , tức không đảm bảo rằng thao tác trả tài nguyên là tùy ý , ví dụ nếu các tài nguyên trên đối tượng không còn hoặc chỉ mượn tài nguyên thì việc giải phóng các tài nguyên không tồn tại là một lỗ hõng lớn . Nên RAII phải đảm bảo : Tài nguyên phải tuân thủ theo constructor nếu thành công hoặc giải phóng an toàn nếu thất bại ; Destructor phải đảm bảo xử lý được những việc trong trách nhiệm 

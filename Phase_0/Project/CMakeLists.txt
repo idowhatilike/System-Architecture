@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.16)
 
-project(I_5_8 CXX)
+project(measure_time CXX)
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-add_executable(i58 I_5_8.cpp)
+add_executable(measure_contextswitch measure_ctx_switch.cpp)
