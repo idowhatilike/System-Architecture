@@ -221,8 +221,7 @@ ___________________________________________
 
 ___________________________________________
 
-# Day 007 : 
-
+# Day 007 : 15 / 10 / 2026
 
 ___________________________________________
 
@@ -239,10 +238,71 @@ ___________________________________________
 - Thu thập tài nguyên khi khởi tạo (Resource Acquisition Is Initialization - RAII) là một cơ chế thiết kế nhằm quản lý (quyền sở hữu) tài nguyên theo vòng đời (scope , ...) . Đóng gói các tài nguyên vào một class RAI (Constructor xin tài nguyên , Destructor nhả) và ép buộc phải dùng thông qua biến tự động (object) của class RAII 
 - Ý tưởng cốt lõi : Khởi tạo đối tượng (dùng construction - Xin và tiếp nhận quyền quản lý tài nguyên) ->
 sử dụng tài nguyên -> Hủy đối tượng (dùng destruction - Giải phóng các tài nguyên đã xin và tiếp nhận)
-+ Construction = Hàm khởi động ngay khi đối tượng (obj) được khởi tạo nhằm kiểm tra các tài nguyên cần thiết , nếu thất bại và ném về ngoại lệ thì đối tượng bị hủy bỏ , các tài nguyên đã xin được cũng trả lại (nhưng nếu tài nguyên trong thân construction - tức tài nguyên thủ công do ta tự đặt vào vẫn có thể bị rò rỉ)
++ Construction = Hàm khởi động ngay khi đối tượng (obj) được khởi tạo nhằm kiểm tra các tài nguyên cần thiết , nếu thất bại và ném về ngoại lệ thì đối tượng bị hủy bỏ , các tài nguyên đã xin được cũng trả lại (nhưng nếu tài nguyên trong thân construction - tức tài nguyên thủ công do ta tự đặt vào vẫn có thể bị rò rỉ) (không nên ném ngoại lệ trong construction vì không biết làm gì)
 + Destruction = Hàm được trình biên dịch tự động chèn vào điểm kết thúc vòng đời (scope , return , break , throw , ... bất kỳ điều gì kết thúc vòng đời đối tượng đó) dùng để giải phóng tài nguyên dù cho có thoát scope sớm (nếu gặp sự cố destruction không xử lý được như ném ngoại lệ lúc stack unwinding -> std::terminate) .
 + Khi rời khỏi chương trình hoặc tháo gỡ stack (stack unwinding) các biến cục bộ sẽ bị giải phóng ngược quá trình khởi tạo (ví dụ là khởi tạo sẽ chèn lên đỉnh stack thì sẽ bốc ngược lại , có thể không phải stack nhưng đảm bảo tính ngược lại với quá trình khởi tạo)
 + RAII là một tư duy thiết kế hệ thống , ví dụ như Rule of Five gồm 5 điều cần quan tâm khi thiết kế bất cứ điều gì : Destruction , Copy/Move construction , Copy/Move assignment operato . RAII rất mạnh nhưng không đảm bảo 100% và nó chỉ quản lý tài nguyên chứ không đảm bảo tài nguyên đó thực hiện đúng quá trình khi gặp sự cố
 + unique_ptr và shared_ptr là 2 con trỏ áp dụng RAII rất rõ : unique_ptr - chỉ duy nhất 1 biến sở hữu , giải phóng biến địa chỉ đó thì bộ nhớ giá trị đó cũng đi còn shared_ptr chỉ giải phóng khi toàn bộ biến con trỏ cùng shared con trỏ đó đã được giải phóng 
 + Ta hạn chế copy vì tài nguyên sử dụng thường là lớn và cùng một địa chỉ gây phức tạp quá trình , nên dùng move để đổi chuyển giao quyền sở hữu và trách nhiệm dọn dẹp từ a -> b
 - Không phải mọi tài nguyên đều có thể tuân theo RAII ví dụ như : thời gian xử lý CPU , lượng điện tiêu thụ , ... , tức RAII không thể quản lý quyền sở hữu , tức không đảm bảo rằng thao tác trả tài nguyên là tùy ý , ví dụ nếu các tài nguyên trên đối tượng không còn hoặc chỉ mượn tài nguyên thì việc giải phóng các tài nguyên không tồn tại là một lỗ hõng lớn . Nên RAII phải đảm bảo : Tài nguyên phải tuân thủ theo constructor nếu thành công hoặc giải phóng an toàn nếu thất bại ; Destructor phải đảm bảo xử lý được những việc trong trách nhiệm 
+
+___________________________________________
+
+# Day 008 : 16 / 10 / 2026
+
+___________________________________________
+
+## I / std::exchange
+(Đọc wiki đê hehe)
+- Tổng quát : lấy giá trị cũ của obj để trả về, đồng thời thay giá trị của obj bằng new_value
+- Giải thích cụ thể từng thành phần lệnh : 
+- noexpect(list) : kiểm tra các điều kiện để hạn chế nhất có thể ngoại lệ (lỗi) gồm 2 ý chính :
++ is_nothrow_move_constructible kiểm tra có thể move construct mà không ném ngoại lệ không
++ is_nothrow_assignable kiểm tra có thể gán mà không ném ngoại lệ không
+-> Nếu pass thì thực thi lệnh của hàm
+- Khái niệm : lvalue và rvalue , tạm hiểu lvalue là biểu thức xác định có thể định danh và dùng truy cập đối tượng còn rvalue có thể hiểu là loại biểu thức thường biểu diễn giá trị tạm thời thường dùng để tạo ra hoặc khởi tạo thứ khác (ví dụ : int x = 20 -> x là lvalue , 20 là rvalue )
+- Dùng U&& (U = T) nhằm khi nhận dữ liệu truyền vào U sẽ giữ được loại của biến truyền vào là l/rvalue và quy tắc để ép loại (chỉ có /&& + && -> && , ngược lại -> & (lvalue = T& , rvalue = T))
+(lưu ý ta cần U giữ thể loại vì truyền vào exchange U&& value : value luôn sẽ là lvalue)
++ move(T& obj) : biến obj -> rvalue rồi move constructor
++ forward<U> với forward là ép kiểu , U là kiểu chính xác giá trị value truyền vào 
+
+___________________________________________
+
+## II / Construtors , Destructors , Stactic (OOP - Nguyễn Minh Huy)
+
+- Khi khởi tạo đối tượng để đảm bảo khỏi giá trị rác khởi tạo do trình biên dịch cung cấp ta cần constructors để điều thông tin cho dữ liệu . Có thể xem như "giấy khai sinh"
+- Quy tắc : Constructors should never throw expection 
+- Note : 
++ Đối tượng đã được tạo , Constructor hoàn tất việc khởi tạo đấy bằng một cam kết . Nếu constructor thất bại sẽ khó xử lý -> nên constructor trước khi đối tượng được khởi tạo xong
++ Khi dùng constructor tạo copy , tức ví dụ : a(b) (copy b -> a) thì b phải buộc dùng dạng const T& vì nó không copy mà dùng chính b , nếu copy sẽ gọi đệ quy vô hạn và lỗi
+- Destructor là hàm dùng để xóa bỏ dữ liệu trong giấy khai sinh .
+- Static là chỉ số ta thêm vào để tất cả đối tượng cùng class dùng chung (có thể xem như biến toàn cục của cấu trúc) . Khai báo trong hàm nhưng gán giá trị ở ngoài 
+- (Constructor : <class>(args) ; Destructor : ~<class>())
+
+___________________________________________
+
+## III / std::unique_ptr 
+(Tiếp tục đọc wiki đi %-%) (Giáo sư *^*)
+
+- Là smart pointer có độc quyền sở hữu một hay một mảng đối tượng . Tức một đối tượng thì có thể có nhiều con trỏ chứa địa chỉ nó nhưng chỉ một con trỏ là có quyền sở hữu địa chỉ đó . Vì là quyền sở hữu độc nhất nên chúng ta không thể dùng pt __copy mà phải dùng __move (các kiến thức như khi nào tài nguyên giải phóng , deleter là và có tác dụng gì , ... thì đọc wiki) . Đi sau vào 5 đặc tính cần chú ý của unique_ptr :
+- Deleter phải thõa mãn điều kiện gì ? Phải nhận vào con trỏ 
+- Thao tác move bắt buộc điều gì ? Không được dùng const để kế thừa hay khởi tạo . Lý do : Khi dời quyền sở hữu tức đưa đối tượng sở hữu ban đầu thành rỗng , const thì không đổi được
+- Có đảm bảo khi gặp expection ? Có vì nó áp dụng tư tưởng thiết kế RAII
+- Để đi sau hơn 2 tính chất sau , Reze sẽ bổ sung kiến thức  :
+
+___________________________________________
+
+### a. Kiểu hoàn chỉnh và chưa hoàn chỉnh
+
+- Điểm khác nhau : Kiểu chưa hoàn chỉnh là kiểu mà ta chưa hề biết trước dữ liệu , kích thước , ... gì về nó (ví dụ : class A; )
+- Ta có thể tạo con trỏ chứa 1 biến chưa hoàn chỉnh (nhưng không thể thao tác hay tạo biến đó được) nên ta cũng có thể dùng unique_ptr (unique_ptr <A> p chứ unique_ptr p(new A) là sai vì destructor phải xóa 1 đối tượng hoàn chỉnh , dùng new là cấp bộ nhớ phải xóa với con trỏ)
+- Kỹ thuật phổ biến nhất áp dụng kiểu dữ liệu chưa hoàn chỉnh là : PImpl
+- PIml (Pointer to Implementation) : Viết chương trình chỉ cần giao diện công khai còn các chi tiết kỹ thuật bị ẩn đi (Gọi là BlackBox cho trường hợp này nhỉ ?)
+
+### b. Base , Derived và "virtual" (thuộc về Kế thừa và đa hình)
+
+- Base (Cơ sở) và Derived (Kế thừa) là hai khái niệm về loại class . Base tức là một class tổng quát cho một đối tượng . Còn Derived chính là việc đi vào một đối tượng cụ thể phát triển từ Bass (ví dụ class Vechile - class Motobike ; class Anime - class Dog ; có thể khai báo dạng Base p = new Derived)
+- Chính từ việc Base p = new Derived có một vấn đề ; nếu ta chỉ dùng Dervied p = new Derived hủy thì nó sẽ gọi destructor : ~Derived , ~Base (vì Derived = Based cụ thể , chi tiết hơn) , còn đặt kiểu p mà dùng tạo derived sẽ khiến compiler khi chạy sẽ đối xử với nó như Base , bỏ qua việc gọi derived trong khi tạo bằng derived phải dùng destructor derived giải phóng tài nguyên . Dùng virtual để nói cho C++ biết là đi sâu vào và kiểm tra xem nó thực sự là gì 
+- Vậy con trỏ virtual xử lý như nào ? Gồm 2 bước : 
++ Tạo bảng tra cứu (vtable) : Địa chỉ destructor cho riêng base hay derived
++ Nhét con trỏ ẩn trong bảng tra cứu ứng với địa chỉ destructor thực sự (~Dervied() -> ~Base())

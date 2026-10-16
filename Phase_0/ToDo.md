@@ -33,3 +33,9 @@
 - [X] Hiểu cơ chế switch context
 - [X] Hiểu cơ chế ảo hóa CPU
 - [X] Tính đồng thời khi xử lý , hiểu rõ hơn về procedure 
+
+# Day 007 : Homework Mechanism LDE & RAII 
+- [X] Code đo thời gian của syscall và context switch
+- [X] Tìm hiểu về RAII 
+
+# Day 008 : 
