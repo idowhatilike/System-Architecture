@@ -254,7 +254,7 @@ ___________________________________________
 
 ## I / std::exchange
 (Đọc wiki đê hehe)
-- Tổng quát : lấy giá trị cũ của obj để trả về, đồng thời thay giá trị của obj bằng new_value
+- Tổng quát : chuyển giao quyền sở hữu đối tượng và trả về giá trị cũ
 - Giải thích cụ thể từng thành phần lệnh : 
 - noexpect(list) : kiểm tra các điều kiện để hạn chế nhất có thể ngoại lệ (lỗi) gồm 2 ý chính :
 + is_nothrow_move_constructible kiểm tra có thể move construct mà không ném ngoại lệ không
@@ -306,3 +306,58 @@ ___________________________________________
 - Vậy con trỏ virtual xử lý như nào ? Gồm 2 bước : 
 + Tạo bảng tra cứu (vtable) : Địa chỉ destructor cho riêng base hay derived
 + Nhét con trỏ ẩn trong bảng tra cứu ứng với địa chỉ destructor thực sự (~Dervied() -> ~Base())
+
+___________________________________________
+
+# Day 009 : 17 / 10 / 2026
+
+___________________________________________
+
+## I / Các câu hỏi định hướng sâu
+
+___________________________________________
+
+### a. Lưu thanh ghi User-mode vào Kernel Stack khi xảy ra Trap/Interrupt
+
+- Lưu thanh ghi User-mode là do đang thực hiện trên CPU vật lý tức HardWare . Khi dùng Trap để báo lệnh thì sẽ ghi thông tin dựa trên cấu trúc CPU (thường trên kstack) rồi chuyển quyền và đồng thời cũng nâng lên mức kernel-mode và OS sẽ ghi dữ liệu vào bộ nhớ quản lý của đối tượng nếu chọn context-switch (hardware chưa chắc lưu hết user-mode mà os kernel cũng có thể lưu phụ một phần)
+- Khi xảy ra Interrupt (bất đồng bộ) sẽ gọi được xử lý bằng cơ chế interrupt handler do hardware và OS đảm nhiệm và ghi dữ liệu vào kstack của tiến trình hiện tại vào kstack rồi chuyển giao cho OS toàn quyền kiểm soát và OS lúc này muốn context-swtich sẽ gọi switch trước tiên là lưu dữ liệu (đang ở kernel-mode) của tiến trình vào bộ nhớ quản lý rồi tráo địa chỉ con trỏ stack
+- Xét sự tương đồng hai cơ chế này khá thú vị : Trap và interrupt đều chuyển quyền điều khiển từ user-mode sang kernel-mode thông qua cơ chế phần cứng và mã xử lý của OS
+
+### b. Lưu thanh ghi Kernel-mode vào proc_struct (PCB) khi gọi switch(). Tại sao việc thay đổi thanh ghi Stack Pointer (SP) sang k-stack của tiến trình đích lại khiến lệnh return-from-trap chuyển quyền thực thi sang tiến trình mới ?
+
+- Sở dĩ cần lưu vào proc_struct là vì khi chuyển từ user-mode sang kernel-mode thì trạng thái tiến trình sẽ khác với trạng thái tiến trình ở lúc kết hay sẽ khác với lúc gọi switch để context_switch khi gọi trap nên lưu vào proc_struct để đảm bảo khôi phục
+- Thay đổi SP khiến lệnh return-from-trap chuyển quyền thực thi ta cần phải hiểu cơ chế thực thi và return-from-trap . Sau khi khôi phục trạng thái user-mode từ return-from-trap để chạy chương trình , OS cần nạp dữ liệu từ kstack thông qua địa chỉ sp để thực thi . Chính vì sp đã trỏ vào tiến trình đích thay vì tiến trình nguồn nên chuyển quyền thực thi thành công . Vốn dĩ CPU không biết tiến trình nào , chỉ quan tâm là trạng thái tiến trình thực thi
+
+_________________________________________________________________
+
+## II / Syscall (man syscall(2) và man syscalls(2)) và Register
+
+_________________________________________________________________
+
+- Đa phần các syscall dùng thư viện cung cấp là các hàm procedure được đính kèm lệnh trap (hay còn gọi là các hàm có bọc - wrapper) . Nhưng không phải hàm nào cũng có wrapper , khi đó ta cần dùng lệnh syscall như sau :
+- syscall(number , ...) trong đó number là id lệnh thực thi , args là các tham số . Tuy nhiên vấn đề phức tạp là ở khi dùng syscall ta cần tuân thủ ABI của cấu trúc và hệ điều hành đang sử dụng
+- Sự thay đổi và nhóm các lệnh syscall rất phức tạp , đi tra inf khi cần thao tác (Chisikudo Advise)
+- Bus địa chỉ (Address Bus) là các đường tín hiệu (như dây dẫn) dùng để truyền địa chỉ của vị trí hoặc thiết bị cần truy cập . Tác dụng duy nhất : Truyền địa chỉ vùng nhớ mà CPU đang muốn đọc hoặc ghi
+- Các thanh ghi : 
++ Tích lũy (phục vụ tính toán - lưu các phép tính và chứa kết quả) ; 
++ Đếm chương trình (PC) chứa địa chỉ ô nhớ lệnh kế tiếp (ở ô nhớ tiếp theo thường là sau khi CPU thực hiện xong 1 lệnh) ; 
++ Thanh ghi lệnh (IR) lưu lệnh đang thực hiện ; 
++ Thanh ghi MAR (Memory Address R) và MBR (Memory Buffer R) là giao diễn giữa CPU và và Bus địa chỉ , nhận địa chỉ ô nhớ từ PC -> bus địa chỉ (MRA) , nhận địa chỉ từ bus địa chỉ -> IR (MRB)
++ Con trỏ ngăn xếp (SP) chứa địa chỉ đỉnh ngăn xếp với 2 trò đẩy và lấy dữ liệu từ đỉnh ; 
++ Thanh ghi trạng thái (FR) : mỗi bit lưu trạng thái kết quả phép tính ALU được thực hiện (hoặc cụ thể hơn là các trạng thái như zero , carry , sign hoặc overflow);
++ Thanh ghi đa năng : Có nhiều chức năng như chứa toán hạng đầu vào hoặc đầu ra ;
++ Các thanh ghi tạm thời : chứa toán hạng đầu vào , hỗ trợ song song , ...
+(GRP để truyền đối số ; lưu dữ liệu thường dùng GRP + PC + FR)
+
+Note : Quá trình thực thi lệnh từ PC đến IR (cơ bản) :
++ B1 : PC giữ địa chỉ ảo lệnh cần thực hiện tiếp theo của CPU nằm trên address space
++ B2 : MAR sẽ nhận và giữ địa chỉ lệnh từ PC , sau đó thông qua Bus address (thường là CPU và RAM , có thể thông qua cơ chế truyền tải địa chỉ , trong các máy hiện đại thì như MMU , cache , ...) để truyền địa chỉ đó vào Memory (thường là RAM) xác định nội dung cần đọc và kiểm tra theo cơ chế hệ thống
++ B3 : Nội dung lệnh được truyền về vào đệm là MBR (đó là lý tên gọi Memory Buffer Register) thường thông qua Data Bus và đưa cho IR , IR giải mã nội dung và thực thi lệnh
+
+### a. Khi gọi hàm bọc (wrapper) trong glibc như read() hoặc write(), User-space truyền mã định danh System Call (syscall number) và các đối số qua những thanh ghi CPU nào trước khi phát lệnh syscall/trap
+
+- Bằng thanh ghi đa năng GRP (RAX , RDI , RSI , RDX , R10 , R8 , R9)
+
+### b. Giá trị trả về và mã lỗi (errno) được Kernel trả ngược về User-space bằng cơ chế nào ?
+
+- Khi gọi thất bại thì trả về một giá trị âm x , khi đó ta sẽ đặt errno bằng giá trị âm x đó và trả về -1 
