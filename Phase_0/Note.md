@@ -360,4 +360,46 @@ Note : Quá trình thực thi lệnh từ PC đến IR (cơ bản) :
 
 ### b. Giá trị trả về và mã lỗi (errno) được Kernel trả ngược về User-space bằng cơ chế nào ?
 
-- Khi gọi thất bại thì trả về một giá trị âm x , khi đó ta sẽ đặt errno bằng giá trị âm x đó và trả về -1 
+- Khi gọi thất bại thì trả về một giá trị âm x , khi đó ta sẽ đặt errno bằng giá trị âm x đó và trả về -1
+
+_________________________________________________________________
+
+# Day 010 : 18 / 10 / 2026 : Strace
+
+_________________________________________________________________
+
+## I / Man 1 : Strace
+
+_________________________________________________________________
+
+- Cơ bản là tiện ích strace "strace command" sẽ chạy dòng lệnh cụ thể đến khi thoát và ghi chép các syscalls và tín hiệu (ngoài ra còn dùng strace -p PID để strace 1 tiến trình đang chạy) . Vì việc nằm ở ranh giới của user/kernel và ghi chép trình tự các syscalls và tín hiệu nên đây là công cụ tuyệt vời cho cả lập trình viên , hacker , sinh viên , quản trị hay người sửa lỗi , đặc biệt với các chương trình lỗi (chưa hoàn chỉnh , hành vi bất thường) . Dạng cơ bản của kết quả trả về : func(args) = return_value (write(1, "Hello\n", 6) = 6, nghĩa là syscall write yêu cầu ghi 6 byte vào file descriptor 1 và trả về kết quả 6) ; ngoài ra còn có nhiều cách dùng nâng cao . Đọc wiki về 4 ví dụ nâng cao : 1 tiến trình đang đợi và nhận tín hiệu Ctrl+C kill ; thực thi đa nhiệm (luồng / tiến trình , ...) ; Dùng inject trì hoàn syscall hoặc chèn tín hiệu kiểm tra hành vi chương trình ; và chuyển đổi các giá trị cờ về dạng text dễ đọc , ... 
+
+_________________________________________________________________
+
+## II / Man 2 : Pipe
+
+_________________________________________________________________
+
+- Cơ bản pipe là kênh dữ liệu một chiều chuyên dùng để tương tác giữa các tiến trình trong đó tồn tại 2 mảng là pipedf[0,1] ánh xạ đến file fd của pipe (đọc hay viết đều cần fd id và pipe không ngoại lệ) trong đó : pipefd[0] là đọc từ cuối pipe ra buffer , còn pipefd[1] là ghi từ buffer vào cuối pipe . Dùng pipe2(option flags) để điều chỉnh hành vị (Cơ bản là file trung gian có sẵn để ta khỏi phải tự tạo và quản lý)
+
+(Khi một tiến trình chạy sẽ có 1 file fd :  để quản lý ghi/đọc/báo lỗi tham chiếu đến đối tượng I/O ; thường có sẵn 0/1/2 là ghi chuẩn , đọc chuẩn và báo lỗi chuẩn)
+
+_________________________________________________________________
+
+## III / Man 2 : Close
+
+_________________________________________________________________
+
+- Cú pháp close fd(i) để đóng phần tử có giá trị fd[i] trong mảng fd hiện tại và khiến fd[i] không còn hợp lệ trong tiến trình nữa (trừ phi cấp phát lại lại) (nhưng đối tượng vẫn tồn tại và fd[i] vẫn giữ nguyên giá trị cũ)
+
+_________________________________________________________________
+
+
+## IV / Man 7 : Sched_setaffinity
+
+_________________________________________________________________
+
+- Ta dùng cấu trúc cpu_set_t để biểu diễn một mặt nạ để xác định tập hợp các CPU mà luồng đó có thể thực thi , và được trỏ tới bởi mask . Ta dùng sched_setaffinity để thiết lập mối quan hệ đó với cấu trúc cơ bản int sched_setaffinity(pid_t pid,size_t cpusetsize,const cpu_set_t *mask) tức thiết lập mask cpu của luồng có id là pid thành mask . Một vài lưu ý :
++ Phải dùng con trỏ mask lý do đơn giản nhất là cpu_set vì máy tính hiện đại có tới tối đa 1024 nhân CPU (hoặc hơn) , tức cần 1024 bits -> 128 bytes , mà thanh ghi GRP chứa tối đa 8 bytes nên phải thông qua con trỏ mask chứa địa chỉ rồi mới truy cập được giá trị cpu_set thay vì truyền thẳng
++ CPU_ZERO& xóa danh sách ; CPU_SET(mask , &set) và pid = 0 là tiến trình hiện tại
+

@@ -38,4 +38,16 @@
 - [X] Code đo thời gian của syscall và context switch
 - [X] Tìm hiểu về RAII 
 
-# Day 008 : 
+# Day 008 : Theory Object 
+- [X] Học về exchange và unique_ptr và lý thuyết về kiểu 
+- [X] Hiểu rõ về quy trình vòng đời và Constructor , Destructor
+- [X] Học về kiểu chương trình và Pimpl 
+- [X] Hiểu về Based , Derived và từ khóa virtual
+
+# Day 009 : Exercies & Theory 
+- [X] Hoàn thành câu 1 và 2 trong câu hỏi chuyên sau
+- [X] Hiểu rõ syscall và các thanh ghi
+
+# Day 010 : Theory 
+
+- [X] Học về strace , pipe , close và Sched_setaffinity
