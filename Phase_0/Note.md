@@ -387,19 +387,49 @@ _________________________________________________________________
 _________________________________________________________________
 
 ## III / Man 2 : Close
-
 _________________________________________________________________
 
 - Cú pháp close fd(i) để đóng phần tử có giá trị fd[i] trong mảng fd hiện tại và khiến fd[i] không còn hợp lệ trong tiến trình nữa (trừ phi cấp phát lại lại) (nhưng đối tượng vẫn tồn tại và fd[i] vẫn giữ nguyên giá trị cũ)
 
 _________________________________________________________________
 
-
 ## IV / Man 7 : Sched_setaffinity
-
 _________________________________________________________________
 
 - Ta dùng cấu trúc cpu_set_t để biểu diễn một mặt nạ để xác định tập hợp các CPU mà luồng đó có thể thực thi , và được trỏ tới bởi mask . Ta dùng sched_setaffinity để thiết lập mối quan hệ đó với cấu trúc cơ bản int sched_setaffinity(pid_t pid,size_t cpusetsize,const cpu_set_t *mask) tức thiết lập mask cpu của luồng có id là pid thành mask . Một vài lưu ý :
 + Phải dùng con trỏ mask lý do đơn giản nhất là cpu_set vì máy tính hiện đại có tới tối đa 1024 nhân CPU (hoặc hơn) , tức cần 1024 bits -> 128 bytes , mà thanh ghi GRP chứa tối đa 8 bytes nên phải thông qua con trỏ mask chứa địa chỉ rồi mới truy cập được giá trị cpu_set thay vì truyền thẳng
 + CPU_ZERO& xóa danh sách ; CPU_SET(mask , &set) và pid = 0 là tiến trình hiện tại
 
+_________________________________________________________________
+
+# Day 011 : 19/10/2026 
+
+_________________________________________________________________
+
+## I / Man Stdio && write && ofstream
+_________________________________________________________________
+
+### a. Lý thuyết bổ sung
+
+- Là thư viện thuộc libc nhằm cung cấp giao diện I/O theo stream và hỗ trợ buffering tránh việc thao tác vật lý với đối tượng I/O (stream : luồng dữ liệu mà tiến trình đọc/ghi) . Khi khởi động sẽ có 3 stream chuẩn được khởi tạo là stdin ; stdout và stderr , đây là các đối tượng mà con trỏ FILE* trỏ tới (các luồng mà stream gắn vào) . Dữ liệu khi ghi không nhất thiết bị gửi đi mà được gom trong buffer rồi mới đẩy xuống I/O , từ đó có 3 hành vi : 
++ Unbuffered : chuyển đi ngay theo cơ chế I/O không phải gom đầy buffer
++ Line-buffered : chuyển đi khi gặp các đối tượng '\n'
++ Fully-buffered : chuyển đi khi đầy buffer hoặc flush
+- Thông thường stderr sẽ không fully-buffered . Còn stdio thì line-buffered nếu gán với terminal và fully-buffered khi không kết nối với hàm tương tác khác (như terminal , ... bằng cách chuyển hướng vào pipe , file). Hàm fflush yêu cầu chuyển dữ liệu trong buffer xuống I/O . Có thể dùng fclose để hủy stream , xử lý buffer và chờ giải phóng tài nguyên stream với FILE* chỉ định và cũng có thể mở fie và tạo stream bằng fopen
+- Write(size_t count - int fd, const void buf[count], size_t count) ghi dữ liệu từ buf vào file có id fd[i]
+- Ofstream là giao diện I/O ở c++ với dấu ">>" (ofstream -> ostream -> ios -> iosbase)
+- Iosbase là cơ sở chứa thiết lập chung I/O ; ios là cơ sở chứa trạng thái và thông tin định dạng cho stream kế thừa isobase ; ostream (stdio) lớp cung cấp giao diện kết hừa ios ; ofstream kế thừa ostream và dùng ">|<"
+
+### b. Câu hỏi : Phân tích cơ chế bộ đệm mặc định của stdio (fwrite / std::ofstream) so với lệnh gọi hệ thống trực tiếp write(). Tại sao việc gom dữ liệu ở User-space trước khi gọi write() lại giảm thiểu chi phí chuyển đổi đặc quyền (Mode Switch overhead) ?
+
+- Trả lời : Lệnh gọi hệ thống write trực tiếp là ghi dữ liệu vào đối tượng I/O chỉ định thông qua wrapper func cần dùng system call và mode-switch . Còn cơ chế buffer của stdio cho phép ghi vào bộ nhớ mà thư viện cung cấp ở user-space và chỉ đẩy đi khi cần từ đó giảm thiểu nhờ overhead mode-switch , tối thiểu syscall
+
+_________________________________________________________________
+
+## II / RAII Ownership trên tài nguyên Kernel (man 2 close & C++ Lifetime):
+
+_________________________________________________________________
+
+- Câu hỏi : Một File Descriptor (int fd) là chỉ số trỏ vào bảng File Descriptor Table nằm trong vùng nhớ của Kernel. Khi bọc fd vào một class C++ (RAII), tại sao bắt buộc phải vô hiệu hóa Copy Constructor/Copy Assignment (= delete) và sử dụng std::exchange(other.fd_ , -1) trong Move Constructor?
+
+- Trả lời : Lý do tương tự với unique_ptr là cơ chế sở hữu độc quyền với tài nguyên , ở đây là đối tượng I/O mà fd[i] trỏ tới , việc chia sẽ quyền sở hữu độc nhất gây khó khăn cho destructor và các hành vi bất thường
