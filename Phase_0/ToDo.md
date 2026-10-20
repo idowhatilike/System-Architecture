@@ -51,3 +51,12 @@
 # Day 010 : Theory 
 
 - [X] Học về strace , pipe , close và Sched_setaffinity
+
+# Day 011 : Theory & Exe
+
+- [X] Hiểu rõ hơn về cơ chế in/out
+- [X] Trả lời câu hỏi RAII 
+
+# Day 012 : Exe
+
+- [X] Hoàn thành các câu nghiên cứu sâu
