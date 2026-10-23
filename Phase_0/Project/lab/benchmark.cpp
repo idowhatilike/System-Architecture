@@ -6,7 +6,7 @@
 
 using namespace std;
 
-const int N = 100'000;
+const int N = 100'0;
 
 void TaskA(){
     auto s = chrono::steady_clock::now();
@@ -60,15 +60,17 @@ void TaskC(){
         return;
     }
     if (c == 0){
+        cout << "Children id : " << getpid() << '\n';
         ch.close_r() , pr.close_w();
         sched_setaffinity(0, sizeof(cpu_set_t), &set);
         for (int i = 1 ; i <= N ; i ++){
             pr.read();
             ch.write('7');
         }
-        exit(0);
         ch.close_w() , pr.close_r();
+        exit(0);
     }
+    cout << "Parent id : " << getpid() << '\n';
     pr.close_r() , ch.close_w();
     sched_setaffinity(0, sizeof(cpu_set_t), &set);
     auto s = chrono::steady_clock::now();
@@ -89,4 +91,9 @@ signed main(){
     TaskB();
     TaskC();
 
+    for (const auto& entry : std::filesystem::directory_iterator("/proc/self/fd")) {
+        std::cout << "Dang mo FD: " << entry.path().filename() << '\n';
+        auto target = std::filesystem::read_symlink(entry.path());
+        cout << "Dang mo FD: " << entry.path().filename() << " -> " << target << '\n';
+    }
 }

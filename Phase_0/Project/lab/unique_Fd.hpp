@@ -13,7 +13,7 @@ class uniqueFd {
         int _fd; 
     public :    
         ~uniqueFd(){
-            if (_fd >= 0) close(_fd);
+           if (_fd >= 0) close(_fd);
         };
         uniqueFd() : _fd(-1) {}
 
@@ -43,7 +43,7 @@ class scopedPipe {
         scopedPipe(){
             int pf[2];
             if (pipe(pf) == -1){
-                errno = 1;
+                perror("pipe failed");
                 exit(1);
             }
             _r.reset(pf[0]) , _w.reset(pf[1]);
@@ -68,9 +68,9 @@ class scopedPipe {
             return result;
         }
         void close_r(){
-            _r.~uniqueFd();
+            _r.reset();
         }
         void close_w(){
-            _w.~uniqueFd();
+            _w.reset();
         }
 };

@@ -433,3 +433,35 @@ _________________________________________________________________
 - Câu hỏi : Một File Descriptor (int fd) là chỉ số trỏ vào bảng File Descriptor Table nằm trong vùng nhớ của Kernel. Khi bọc fd vào một class C++ (RAII), tại sao bắt buộc phải vô hiệu hóa Copy Constructor/Copy Assignment (= delete) và sử dụng std::exchange(other.fd_ , -1) trong Move Constructor?
 
 - Trả lời : Lý do tương tự với unique_ptr là cơ chế sở hữu độc quyền với tài nguyên , ở đây là đối tượng I/O mà fd[i] trỏ tới , việc chia sẽ quyền sở hữu độc nhất gây khó khăn cho destructor và các hành vi bất thường
+
+_________________________________________________________________
+
+# Day 013 : 22/10/2026 
+
+_________________________________________________________________
+
+## I / Nhiệm vụ
+
+- Số lần gọi thực tế của write (write vs fwrite) : Vì khi đầy buffer thì fwrite mới gọi write và 1 lần dùng fflush gọi write nên số lượng ít vô cùng 
+- Strace làm chậm tiến trình vì có 2 lần chặn syscall bằng syscall pstrace (1 lần vào kernel và 1 lần thoát ra) , mỗi lần cần 2 ctx-switch giữa tiến trình hiện tại và tiến trình strace
+- Khá nhiều lỗi thiết kế :((
+- Khi gọi read mà phần ghi vẫn mở tức vẫn còn ghi vào được thì tiến trình sẽ được đưa về trạng thái Interrupted Sleep 
+
+_________________________________________________________________
+
+# Day 014 : 23/10/2026 
+
+_________________________________________________________________
+
+## I / Knowledge Check
+
+1. Khi goi read() , tien trinh gui tin hieu den CPU , va OS se chuyen trang thai running sang blocked de doi I/O hoan thanh nhiem vu , khi do dong thoi ctx_switch cung se xay ra neu con tien trinh . Khi goi read() tuc syscall tuc co 1 lenh trap duoc gui toi phan cung , phan cung se tra trap handler de xu ly tinh huong
+
+2. Vì chỉ cần 1 biến int (4 bytes) chứa fd đang sở hữu sẽ được lưu trên RAM còn hàm thường sẽ được khai báo trên proc_struc và cũng không có con trỏ vptr (khi có hàm ảo virtual) (8 bytes)
+Khi hàm được viết ngắn gọn trong class/struct sẽ tự động được coi là hàm inline (tức hàm mà dám code thẳng vào lúc gọi hàm) nhờ đó giảm chi phí phát sinh chuyển đổi (bao gồm đẩy địa chỉ quay về , nhảy con trỏ lệnh PC , ...) nhờ đó tương đương viết C thuần
+
+## II / Break check target
+
+1. Dùng ulimit -n thu được con số 1048576 
+2. Khi dùng cat /proc/pid/wchan thu được anon_pipe_read (tức Sleeping , nếu Running lệnh sẽ trả về 0 hoặc null)
+3. Khi chạy LeakSanitizer , lệnh dùng open để đọc /proc/self/task để duyệt qua các luồng đang chạy tiến trình , mỗi lệnh open cần cấp phát 1 fd , task c có 3 fd cơ bản , nếu dùng ulimit -n 5 thì chỉ còn dư 2 và cấp ngay cho parent process , khi đó lỗi và thoát mà chưa giải phóng fd làm hết fd và LeakSanitizer sẽ không còn fd thao tác nên có lỗi EMFILE và cảnh báo LeakSanitizer ; nếu dùng ulimit -n 6 thì lỗi và thaots mà vẫn dư 1 file fd cho LeakSanitizer nên chỉ còn lỗi EMFILE ; còn khi ulimit -n N (N > 6) thì đứng do cả 2 tiến trình đợi pipe 
