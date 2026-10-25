@@ -100,7 +100,7 @@ _______________________________________________________________________
 ### a. API lời gọi hệ thống tạo tiến trình mới - fork()
 
 - Fork là một lệnh gọi hệ thống tạo ra một tiến trình mới  gần như là nhân bản của tiến trình hiện tại (gọi là cha) và tiến trình mới (gọi là con) không bắt đầu tại main mà entry point của nó là sau vị trí hàm fork trong cha (tức thực thi tại điểm mà lời gọi fork) ? Và trạng thái của 2 tiến trình này là khác nhau , nhất là giá trị fork trả về khi con chỉ trả về 0 còn cha thì là pid của con để xử lý hai luồng thực thi riêng biệt (xử lý từ fork đến tiếp). Ở đây có một vấn đề thú vị là sự đồng thời - liệu tiến trình nào sẽ thực thi trước ? ":3" (Có thể hiểu là khi sao chép ta sao chép mọi thứ không chỉ mã nguồn mà 
-dữ liệu stack , heap , ... và cả thanh ghi program counter - pc chỉ báo cho CPU cần thực hiện gì nên tiến trình con sẽ chạy từ sau fork do pc con sao chép cha tức là tính sau fork) (trên máy mình thì cha thường sẽ nhanh hơn con tý - khá hợp lý , cha gọi fork xong đi trước rồi tiến trình con mới tạo xong và đuổi theo)
+dữ liệu stack , heap , ... và cả thanh ghi program counter - pc chỉ báo cho CPU cần thực hiện gì nên tiến trình con sẽ chạy từ sau fork do pc con sao chép cha tức là tính sau fork) (trên máy mình thì cha thường sẽ nhanh hơn con tý - khá hợp lý , cha gọi fork xong con trỏ lệnh đi trước rồi tiến trình con mới tạo xong và đuổi theo - và tiến trình con bỏ qua fork vì con trỏ lệnh đã đi qua)
 
 ### b. API lời gọi hệ thống ép tiến trình chờ đợi - wait()
 
@@ -455,10 +455,10 @@ _________________________________________________________________
 
 ## I / Knowledge Check
 
-1. Khi goi read() , tien trinh gui tin hieu den CPU , va OS se chuyen trang thai running sang blocked de doi I/O hoan thanh nhiem vu , khi do dong thoi ctx_switch cung se xay ra neu con tien trinh . Khi goi read() tuc syscall tuc co 1 lenh trap duoc gui toi phan cung , phan cung se tra trap handler de xu ly tinh huong
+1. Khi goi read() , thuc thi lenh trap , va OS se chuyen trang thai running sang blocked de doi I/O hoan thanh nhiem vu , khi do dong thoi ctx_switch cung se xay ra neu con tien trinh . Khi goi read() tuc syscall tuc co 1 lenh trap duoc gui toi phan cung , phan cung se tra trap handler de xu ly tinh huong , roi xong dua vao Runnable de xu ly bang scheduler
 
-2. Vì chỉ cần 1 biến int (4 bytes) chứa fd đang sở hữu sẽ được lưu trên RAM còn hàm thường sẽ được khai báo trên proc_struc và cũng không có con trỏ vptr (khi có hàm ảo virtual) (8 bytes)
-Khi hàm được viết ngắn gọn trong class/struct sẽ tự động được coi là hàm inline (tức hàm mà dám code thẳng vào lúc gọi hàm) nhờ đó giảm chi phí phát sinh chuyển đổi (bao gồm đẩy địa chỉ quay về , nhảy con trỏ lệnh PC , ...) nhờ đó tương đương viết C thuần
+2. Vì chỉ cần 1 biến int chứa fd đang sở hữu sẽ được lưu trên RAM còn hàm thường sẽ được khai báo và cũng không có con trỏ vptr (khi có hàm ảo virtual)
+Khi hàm được viết ngắn gọn trong class/struct sẽ tự động được coi là hàm inline (tức hàm mà dám code thẳng vào lúc gọi hàm) nhờ đó giảm chi phí phát sinh chuyển đổi (bao gồm đẩy địa chỉ quay về , nhảy con trỏ lệnh PC , ...) bên cạnh đó không cần 1 con trỏ , vptr , và tối ưu các thao tác nhờ đó tương đương viết C thuần
 
 ## II / Break check target
 

@@ -48,7 +48,7 @@
 - [X] Hoàn thành câu 1 và 2 trong câu hỏi chuyên sau
 - [X] Hiểu rõ syscall và các thanh ghi
 
-# Day 010 : Theory 
+# Day 010 : Theory  
 
 - [X] Học về strace , pipe , close và Sched_setaffinity
 
@@ -60,3 +60,7 @@
 # Day 012 : Exe
 
 - [X] Hoàn thành các câu nghiên cứu sâu
+
+# Day 013 & 014 : Exe
+
+- [X] Xong phase 0
