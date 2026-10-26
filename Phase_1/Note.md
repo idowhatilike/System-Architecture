@@ -53,3 +53,59 @@ ___________________________________________________________
 + 2. __Dung lượng buffer và tính nguyên tử__ : Linux hiện đại mặc định là 65536 - 64KB (mò ra con số này ở bài nào á quên rồi :>) , nếu ghi đầy mà tiếp tục ghi thì write sẽ bị chặn cho đến khi nào có chỗ trống . Còn PIPE_BUF (trên Linux thường là 4KB) là giới hạn trên kích thước ghi đảm bảo tính nguyên tử việc ghi vào , ngược lại sẽ chia nhỏ ra và khi đó không còn đảm bảo tính chất nguyên tử ấy (con số có thể khác biệt phụ thuộc vào nhiều yếu tố)
 + 3. __Quy tắc EOF__ : Bản chất là xét còn có thể có dữ liệu nào được gửi đến không , nếu còn thì cho read() vào trạng thái đợi , ngược lại lập tức kết thức và trả về 0 
 + 4. __Quy tắc SIGPIPE__ : Bản chất là khi dữ liệu vào ống nhưng tất cả đầu đọc đã đóng gây ra đầy RAM vô ích hoặc treo tiến trình nếu không xử lý đúng cách . Kernel xử lý bằng việc gửi tín hiệu SIGPIPE để chấm dứt , nếu fail thì nhận về -1 và errno = EPIPE
+
+_______________________________________________________________________________________
+
+# Day 001-2 : 24-25/10/2026
+
+___________________________________________________________
+
+## I / Syscall
+
+- **_exit()** : Dùng để kết thúc tiến trình ngay lập tức mà không thực hiện các thao tác dọn dẹp như chuẩn hàm exit() (nhưng kernel vẫn thu hồi tài nguyên)
+- **fcntl** : Dùng để thao tác với các fd đang mở 
+- **sigaction** : Dùng để kiểm tra và thiết lập bố trí (disposition) của 1 tín hiệu (hành động khi nhận tín hiệu)
+- **kill** : gửi tín hiệu đến một (nhóm) tiến trình cụ thể
+
+## II / Signal (bổ sung)
+- Là cơ chế thông thông báo bất đồng bộ 
+- Đặc điểm cốt lõi kỹ thuật :
++ Bất khả xâm phạm : SIGKILL và SIGSTOP (không thể bị chặn , bắt hay bỏ qua)
++ Non-real-time : Không hỗ trợ hàng đợi , 1 signal đang pending có thể gây mất mát các signal cùng loại -> Thiết kế (ban đầu) dành cho standard signal (có hoặc không)
++ Real-time Signals : Hỗ trợ xếp hàng và kèm payload dữ liệu -> Được POSIX thiết kế biến signal thành 1 cơ chế giao tiếp giữa các tiến trình
++ Signal mask : mask riêng của từng tiến trình/luồng giúp xác định tín hiệu nào bị chặn
+- **signal-safety (async-signal-safety)** : cơ chế an toàn xử lý dữ liệu :
++ 1. Chỉ gọi hàm có tính Async-Signal-Safe : Sử dụng trực tiếp các hàm atomic như write , ...
++ 2. Bảo vệ biến errno : cần giữ 1 bản sao lưu trước khi thay đổi errno
++ 3. Biến chia sẽ (cục bộ || static) : Có gắng đưa vệ dạng thao tác nguyên tử như dùng volatile sig_atomic_t (tạo biến cờ và mã chính cho handler) (hoặc các atomic types chuẩn POSIX) (không 100% an toàn và volatile không biến thao tác thành nguyên tử)
++ 4. Pattern khuyến nghị : Việc xử lý signal bằng signal handler trực tiếp tiềm ẩn rủi ro do cướp luồng thực thi -> (được kernel đưa vào context của tiến trình) chuyển tín hiệu về luống chính (event loop) dưới dạng I/O . Trong đó có 2 cách phổ biến là : signalfd(2) ; dùng static pipe (vô danh nhưng không block) -> gọi đúng 1 write vào đầu ghi -> luồng chính đọc byte và dọn dẹp (tự mô phỏng signalfd) (nếu write thất bại thì fail)
+
+## III / Terminal & Phiên
+
+- **chdir** : Thay đổi con trỏ thư mục làm việc hiện tại (CWD) của chính tiến trình gọi (có phiên bản dành cho fd là fdchdir) . CWD có tính kế thừa (fork) và độc lập , giữ qua exec  ; Bản chất là thay đổi con tro pwd nằm trong struct fs_struct trong task struct
+- **getcwd** : Truy vết thư mục làm việc hiện tại , trả về đường dẫn tuyệt đối (dựng link)
+- **setpgid** : quản lý process group (support job control) bằng cách gán pid -> id process group (Mối quan hệ phân cấp : Session -> process groups -> process) (chọn 1 process làm leader group) . Vì an toàn thì kernel quy định tiến trình cha không đổi pgid của tiến trình con sau khi con gọi exec thành công , một tiến trình không thể gia nhập một Process Group thuộc về một Session khác . Race condition kinh điển : tiến trình cha , con (fork) cùng gọi setpgid 
+- **tcsetpgrp** : Quy tắc là 1 thiết bị terminal (đầu cuối) chỉ có 1 nhóm tiến trình là foreground , còn lại là background . Tcsetpgrp chỉ định 1 group trở thành tiền tố của 1 terminal liên kết với fd (thường là STDIN_FILENO) (pgid phải cùng session với terminal)
+
+## IV / Copy-on-write
+
+- Khái niệm : Là cơ chế (kỹ thuật) quản lý tài nguyên nhằm tiết kiệm dữ liệu . Thay vì tạo ra 1 bản sao dữ liệu khi đa tiến trình/luồng sử dụng mà không thay đổi như đọc , tìm kiếm , ... thì chỉ tạo ra bản sao riêng khi có thay đổi dữ liệu .
+- Trong quản lý bộ nhớ ảo : Kernel chia sẽ bộ nhớ vật lý chung giữa cha con và đánh dấu các trang này trong PageTable là Read-Only (RO) , khi cố điều chỉnh thì phần cứng MMU kích hoạt expection Page fault để kernel bắt lấy và cung cấp khung trang vật lý mới (kernel sẽ check page fault có phải do mmu phát và cần ) (sao chép bộ nhớ , gán cờ R-W , ...) (cũng có thể dùng trong quản lý bộ nhớ ảo)
+- Trong SE : std::string c++ ; php (trừ tham chiếu) ; Nhiều kiểu dữ liệu Qt Framework ; Rust ; Hệ thống tệp tầng của Docker ; ... điều áp dụng COW
+- Trong Computer Storage : Cơ chế nền tảng cốt lõi trong các hệ thống tệp tin hiện đại như ZFS , Btrfs , ReFS , ... cũng như trong quản lý các phân vùng logic ; máy chủ mc ; ... Trên hệ thống tệp tin truyền thống khi sửa đổi sẽ ghi đề trực tiếp lên các khối dữ liệu ; với COW các hệ thống hiện đại sẽ dùng kỹ thuật snapshots (lưu ngắn) : chỉ ghi các vị trí bị ảnh hưởng sang vị trí mới trên đĩa và cập nhật con trỏ dữ mới liệu lại cho hệ thống (phù hợp với cơ chế Ổ cứng thể rắn như SSD/Flash) -> Ứng dụng Container và ảo hóa hệ điều hành : Block-level COW ; Fire-level COW
+
+## V / Câu hỏi định hướng :
+
+### Chuỗi sự kiện phần cứng diễn ra khi Kernel tạo trang mới **COW** 
+
+- Bổ sung kiến thức inode và dentry :
++ **inode (Index node)** : bản thể thật của file (chứa kích thước , quyền , timestamps , ...)
++ **dentry (Directory Entry)** : Ta cần ánh xạ tên file (string) <-> inode . Và cấu trúc dentry ra đời với lưu giữ 3 thông tin : tên (d_name) ; con trỏ tới dentry cha ; con trỏ d_inode trỏ tới struct inode của file trên RAM (con trỏ có thể NULL)
+
+- Đầu tiên ta sẽ làm rõ cơ chế chặn của kernel :
++ 1. Mở 1 đối tượng I/O (fd) và gắn cờ O_RDONLY (không thể bị thay đổi bằng các biện pháp đơn giản như fcntl - cờ chế độ truy cập mang tính bất biến trong phiên làm việc đó)
++ 2. Mọi syscall thao tác ghi kích hoạt hàm kiểm tra quyền của VFS (Hệ thống tệp ảo) hoặc đơn giản hơn là (file->f_mode & FMODE_WRITE) -> return -1 và errno = EBADF (bad fd)
++ 3. Nếu chuyển hướng qua bộ nhớ ảo nhằm đánh lừa kiểm tra (mmap) . Nếu dùng mmap - MAP_SHARED thì sẽ thất bại và errno = EACCES vì khi tạo mapping sẽ kiểm tra quyền , trong đó PROT_WRITE trái ngược với chế độ truy cập O_RDONLY . Còn nếu dùng mmap MAP_PRIVATE thì có thể thành công vì MAP_PRIVATE không cam kết ghi ngược dữ liệu (nếu có thì fail ngay lúc chạy mmap rồi :>) về tuy nhiên khi thao tác ghi được thực hiện thì MMU nhận ra vi phạm vì con trỏ trên Page Table vẫn đang chỉ vào file với mà có O_RDONLY và thực hiện việc gửi expection cho kernel xử lý phần còn lại còn file gốc giữ nguyên
+- Thế làm thế nào khi **chỉ có 1 fd gán cờ R-O ?** : Có 2 cách tiêu biểu
++ 1. __Re_open__ : Dùng magic link - symlink (/proc/self/fd/%d) tạo 1 phiên làm việc độc lập hoàn toàn nếu như tiến trình của bạn đủ quyền
++ 2. __Atomic File Upd__ : (Khuyên dùng) Đọc toàn bộ nội dung file read ; tạo và ghi vào 1 file tạm (thông qua open(<file name - tmp>, O_WRONLY | O_CREAT | O_EXCL, 0644)) ; dùng fsync(tmp_fd) đẩy dữ liệu xuống disk và dùng syscall atomic : rename(tmp , cur) để thay thế file
