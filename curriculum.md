@@ -1,292 +1,455 @@
-# Core Systems Engineering Curriculum Blueprint (18-Month Roadmap)
-
-> **Mục tiêu**: Xây dựng tư duy kỹ sư hệ thống có khả năng khảo sát, phân tích và sửa lỗi các hệ thống máy tính phức tạp ("black-box systems") thông qua mô hình tư duy bền vững (durable mental models) thay vì học thuộc lòng lệnh hoặc API.
+# SYSTEM ARCHITECT — FOUNDATIONAL LEARNING ROADMAP
+> **Khung Thời Gian Khóa Chặt**: 01/11/2026 — 31/01/2027 (13 Tuần / 390 Giờ)  
+> **Ngân Sách An Toàn**: 30 Giờ/Tuần (360 Giờ Học Chủ Động + 30 Giờ Buffer Dự Phòng)  
+> **Mục Tiêu Tối Thượng**: Phát triển năng lực phân tích, thiết kế, ra quyết định và kiểm chứng kiến trúc hệ thống (**System Architect & Engineering Decision-Making**).
 
 ---
 
 ## Mục Lục (Table of Contents)
-1. [Triết Lý Kỹ Thuật & Khung Tư Duy (Engineering Philosophy)](#1-triết-lý-kỹ-thuật--khung-tư-duy-engineering-philosophy)
-2. [Kiến Trúc Phụ Thuộc Concept (Dependency Architecture)](#2-kiến-trúc-phụ-thuộc-concept-dependency-architecture)
-3. [Lộ Trình Chi Tiết 18 Tháng (18-Month Timeline)](#3-lộ-trình-chi-tiết-18-tháng-18-month-timeline)
-4. [Kế Hoạch Hàng Tháng & Tiến Độ (Month-by-Month Progress Checklist)](#4-kế-hoạch-hàng-tháng--tiến-độ-month-by-month-progress-checklist)
-5. [Thực Thi Hàng Tuần - Mẫu Tháng 9 (Weekly Execution Prototype)](#5-thực-thi-hàng-tuần---mẫu-tháng-9-weekly-execution-prototype)
-6. [Danh Sách Đồ Án Lớn (Project Specifications)](#6-danh-sách-đồ-án-lớn-project-specifications)
-7. [Bộ Công Cụ Chuẩn & Môi Trường Debug (Toolchain & Environment)](#7-bộ-công-cụ-chuẩn--môi-trường-debug-toolchain--environment)
-8. [Tiêu Chuẩn Đánh Giá Exit Gates (Exit Gate Evaluation Framework)](#8-tiêu-chuẩn-đánh-giá-exit-gates-exit-gate-evaluation-framework)
-9. [Định Hướng Chuyên Sâu (Specialization Gates)](#9-định-hướng-chuyên-sâu-specialization-gates)
-10. [Phạm Vi Hoãn Lại (Scope Control / Exclusions)](#10-phạm-vi-hoãn-lại-scope-control--exclusions)
-11. [Thẻ Ôn Tập Active Recall (Flashcards & Self-Test Questions)](#11--thẻ-ôn-tập-active-recall-flashcards--self-test-questions)
+1. [Mục Tiêu Đào Tạo & 8 Năng Lực Đầu Ra (Architectural Competencies)](#1-mục-tiêu-đào-tạo--8-năng-lực-đầu-ra-architectural-competencies)
+2. [Triết Lý Học Tập & Bộ Tiêu Chuẩn Lựa Chọn Kiến Thức (Pedagogical Philosophy)](#2-triết-lý-học-tập--bộ-tiêu-chuẩn-lựa-chọn-kiến-thức-pedagogical-philosophy)
+3. [Kiến Trúc Phụ Thuộc Concept (DAG Dependency Architecture)](#3-kiến-trúc-phụ-thuộc-concept-dag-dependency-architecture)
+4. [Lộ Trình Thực Chiến 13 Tuần & Ngân Sách Giờ (13-Week Backward Timeline)](#4-lộ-trình-thực-chiến-13-tuần--ngân-sách-giờ-13-week-backward-timeline)
+5. [Hợp Đồng Chuẩn Bị Hạ Tầng Thực Nghiệm (Scaffolded Infrastructure Contract)](#5-hợp-đồng-chuẩn-bị-hạ-tầng-thực-nghiệm-scaffolded-infrastructure-contract)
+6. [Nội Dung Chi Tiết Từng Phase: Kiểm Toán & Phạm Vi Phẫu Thuật](#6-nội-dung-chi-tiết-từng-phase-kiểm-toán--phạm-vi-phẫu-thuật)
+7. [Tài Liệu Học Tập Chuẩn Mực & Phạm Vi Đọc Tinh Gọn (Canonical Reading Scope)](#7-tài-liệu-học-tập-chuẩn-mực--phạm-vi-đọc-tinh-gọn-canonical-reading-scope)
+8. [Danh Sách 5 Đồ Án Kiến Trúc & Tiêu Chuẩn Exit Gates (Architectural Case Projects)](#8-danh-sách-5-đồ-án-kiến-trúc--tiêu-chuẩn-exit-gates-architectural-case-projects)
+9. [Bộ Công Cụ Chuẩn & Môi Trường Quan Sát (Toolchain & Diagnostics)](#9-bộ-công-cụ-chuẩn--môi-trường-quan-sát-toolchain--diagnostics)
+10. [Thẻ Ôn Tập Năng Lực Kiến Trúc (Active Recall Flashcards)](#10-thẻ-ôn-tập-năng-lực-kiến-trúc-active-recall-flashcards)
 
 ---
 
-<a id="1-triết-lý-kỹ-thuật--khung-tư-duy-engineering-philosophy"></a>
-## 1. Triết Lý Kỹ Thuật & Khung Tư Duy (Engineering Philosophy)
+<a id="1-mục-tiêu-đào-tạo--8-năng-lực-đầu-ra-architectural-competencies"></a>
+## 1. Mục Tiêu Đào Tạo & 8 Năng Lực Đầu Ra (Architectural Competencies)
 
-### Kim Chỉ Nam (The North Star)
-Khi đứng trước một hệ thống kiến trúc ẩn (black-box architecture), người học phải tự trả lời 10 câu hỏi cốt lõi:
-- [ ] **What is running?** (Cái gì đang chạy?)
-- [ ] **Where is the state?** (Trạng thái nằm ở đâu?)
-- [ ] **Who owns the state?** (Ai sở hữu trạng thái?)
-- [ ] **How does data move?** (Dữ liệu di chuyển như thế nào?)
-- [ ] **Where is concurrency?** (Thành phần bất đồng bộ/đồng thời nằm ở đâu?)
-- [ ] **What invariants must hold?** (Bất biến nào bắt buộc phải giữ vững?)
-- [ ] **What can fail, and how is it detected and handled?** (Cái gì có thể lỗi, phát hiện và xử lý ra sao?)
-- [ ] **Where is the bottleneck?** (Nút thắt cổ chai nằm ở đâu?)
-- [ ] **How can the system be observed?** (Làm sao để quan sát hệ thống?)
-- [ ] **Which layer should I descend into next to test a hypothesis?** (Nên hạ xuống tầng nào tiếp theo để kiểm chứng giả thuyết?)
-
-### Vòng Lặp Debug (The Debugging Loop)
-Debugging là việc áp dụng phương pháp khoa học vào hệ thống phần mềm:
-```
-Reproduce (Tái hiện) ➔ Observe (Quan sát) ➔ Hypothesize (Đưa giả thuyết) ➔ Measure (Đo lường) ➔ Locate Layer (Xác định tầng) ➔ Fix (Sửa) ➔ Verify (Xác minh)
-```
-
-> [!NOTE]
-> **5 Lăng Kính Xuyên Suốt (Five Cross-Cutting Lenses)**
-> 1. **Security & Risk**: Xác định vùng trusted/untrusted, dữ liệu malformed, cạn kiệt tài nguyên, invariant bị vi phạm.
-> 2. **Performance**: Đo lường trước khi tối ưu. Kết nối thuật toán với layout dữ liệu, cache locality, syscall, I/O, contention và network.
-> 3. **Resource Management**: Xác định tài nguyên giới hạn, quyền sở hữu/giải phóng, xử lý khi vượt tải (Backpressure).
-> 4. **Trade-offs**: Không có kiến trúc tối ưu tuyệt đối. Cần hiểu rõ thiết kế tối ưu cái gì và đánh đổi cái gì.
-> 5. **Targeted Mastery**:
->    - **L1 — Recognize**: Giải thích mô hình tư duy, lý do tồn tại và hậu quả nếu hiểu sai.
->    - **L2 — Reason**: Dự đoán hành vi, dùng API/công cụ đúng, chẩn đoán lỗi cơ bản và phân tích failure mode/trade-off.
->    - **L3 — Engineer**: Xây dựng subsystem hoàn chỉnh, cố tình làm hỏng, quan sát lỗi, đưa giả thuyết, debug và giải thích hành vi xuyên tầng.
+Mục tiêu dài hạn của lộ trình là đào tạo năng lực của một **System Architect**. Công việc trọng tâm bao gồm:
+* Phân tích yêu cầu, xác định đúng bài toán cốt lõi và các ràng buộc (constraints).
+* Thiết kế cấu trúc tổng thể, phân rã subsystem, xác định boundaries và thiết lập interface contracts.
+* Đưa ra quyết định kỹ thuật có cơ sở, phân tích đa chiều các trade-offs, risks và failure modes.
+* Phân tích, chẩn đoán sự cố phức tạp (Root Cause Analysis) và thiết kế khả năng chống chịu (Resilience).
+* Đánh giá và kiểm chứng các thuộc tính chất lượng (Quality Attributes: Performance, Scalability, Reliability, Security).
+* Quản trị sự tiến hóa của kiến trúc theo thời gian khi yêu cầu và quy mô thay đổi.
 
 > [!IMPORTANT]
-> **Gates > Dates**: Lịch trình xác định ngân sách thời gian; Exit Gates quyết định việc chuyển giai đoạn. Nếu trượt Gate, dependency còn thiếu phải được củng cố ngay.
+> **Vai trò của Lập trình**: Lập trình là phương tiện thực nghiệm để hiểu cơ chế, kiểm chứng giả định và tái hiện sự cố; **không phải đầu ra nghề nghiệp chính của curriculum**. Không đo lường tiến độ bằng số dòng code hay khả năng nhớ API, mà bằng năng lực mô hình hóa, bảo vệ quyết định kiến trúc và xử lý sự cố.
+
+### Tám Năng Lực Mục Tiêu (8 Core Competencies)
+1. **System Thinking**: Mô hình hóa cấu trúc hệ thống, ranh giới (boundaries), trạng thái (state), tương tác (interactions), quan hệ phụ thuộc (dependencies) và vòng đời (lifecycle).
+2. **Requirements Engineering**: Phân tích yêu cầu nghiệp vụ, ràng buộc kỹ thuật, định lượng thuộc tính chất lượng (SLIs/SLOs/SLAs, Latency p95/p99) và xác định tiêu chí thành công.
+3. **System Architecture & Design**: Phân rã hệ thống, thiết kế module sâu (Deep Modules), thiết lập hợp đồng giao diện, xác định quyền sở hữu tài nguyên và áp dụng architectural patterns phù hợp.
+4. **Engineering Decision-Making**: Đánh giá các phương án thay thế (alternatives), phân tích trade-offs đa chiều và lập hồ sơ quyết định kiến trúc (**ADR - Architecture Decision Records**).
+5. **Resource & Concurrency Reasoning**: Quản trị tài nguyên (ownership, allocation, contention, exhaustion), bảo vệ bất biến trạng thái (state invariants), đồng bộ hóa và nhất quán dữ liệu.
+6. **System Reliability & Troubleshooting**: Phân tích chế độ lỗi (failure modes), cô lập lỗi (fault containment), chẩn đoán nguyên nhân gốc rễ (Root Cause Analysis), phục hồi và thiết kế tự vệ (backpressure, load shedding).
+7. **Performance & Scalability**: Phân tích điểm nghẽn (bottlenecks), lập kế hoạch dung lượng (capacity planning), cơ chế đệm (caching) và đánh giá độ trễ/thông lượng dưới các giới hạn vật lý.
+8. **Architecture Validation & Evolution**: Kiểm chứng thiết kế bằng thực nghiệm tất định, đánh giá kiến trúc dựa trên kịch bản (scenario-based evaluation) và quản lý tái cấu trúc khi hệ thống mở rộng.
 
 ---
 
-<a id="2-kiến-trúc-phụ-thuộc-concept-dependency-architecture"></a>
-## 2. Kiến Trúc Phụ Thuộc Concept (Dependency Architecture)
+<a id="2-triết-lý-học-tập--bộ-tiêu-chuẩn-lựa-chọn-kiến-thức-pedagogical-philosophy"></a>
+## 2. Triết Lý Học Tập & Bộ Tiêu Chuẩn Lựa Chọn Kiến Thức (Pedagogical Philosophy)
 
-Chương trình được thiết kế dạng **Đồ thị hướng không chu trình (DAG - Directed Acyclic Graph)**:
+### 2.1. Thứ Tự Tư Duy Top-down
+Mọi bài toán kỹ thuật đều tiếp cận theo trình tự:
+$$\text{Problem} \longrightarrow \text{Requirements \& Constraints} \longrightarrow \text{System Decomposition} \longrightarrow \text{Interfaces \& Boundaries} \longrightarrow \text{Trade-off Decisions} \longrightarrow \text{Validation \& Evolution}$$
+
+### 2.2. Tiêu Chuẩn Chuyển Giao Nền Tảng (The Universal Invariant)
+Mọi chủ đề học tập đều phải trả lời được câu hỏi thẩm định:
+> **"Nếu tôi không còn sử dụng Linux, C++ hay công nghệ đang học, năng lực nào tôi vẫn giữ lại được?"**  
+> * Nếu câu trả lời là khả năng phân tích cấu trúc, mô hình hóa hành vi, thiết kế boundaries, lựa chọn architecture, reasoning về trade-offs và chẩn đoán sự cố: **Kiến thức đó ĐÁNG ĐẦU TƯ (HỌC)**.  
+> * Nếu câu trả lời chỉ là nhớ cách gọi một API, biết một cờ bitwise hoặc thuộc một chi tiết cơ khí của phần cứng: **Dứt khoát LOẠI BỎ (KHÔNG HỌC)**.
+
+### 2.3. Ba Lớp Phân Tích Độ Sâu (3-Layer Analysis)
+Mỗi nhóm kiến thức được bóc tách thành 3 lớp để xác định trọng tâm nhận thức:
+1. **Principles & Reasoning**: Nguyên lý cốt lõi, mô hình tư duy, đánh đổi kiến trúc và chế độ lỗi cần hình thành (Bắt buộc làm chủ).
+2. **Mechanisms & Models**: Cơ chế kỹ thuật nền tảng cần hiểu để đưa ra quyết định chính xác và kiểm chứng hành vi (Hiểu sâu mô hình).
+3. **Implementation Details**: API, flags, cú pháp, thông số vi mô (Chỉ tra cứu khi cần, không học vẹt).
+
+Quyết định lựa chọn cuối cùng luôn mang tính nhị phân: **HỌC hoặc KHÔNG HỌC**.
+
+---
+
+<a id="3-kiến-trúc-phụ-thuộc-concept-dag-dependency-architecture"></a>
+## 3. Kiến Trúc Phụ Thuộc Concept (DAG Dependency Architecture)
+
+Lộ trình được cấu trúc dạng đồ thị hướng không chu trình (DAG) dựa trên sự mở rộng dần của ranh giới hệ thống:
 
 ```mermaid
-graph TD
-    P0[Phase 0: Toolchain & C++ RAII/Lifetime] --> P1[Phase 1: Process & Syscalls]
-    P1 --> P2A[Phase 2 Track A: Physical Performance & Cache]
-    P1 --> P2B[Phase 2 Track B: Virtual Memory & Page Faults]
-    P1 --> P3[Phase 3: Concurrency & TCP Sockets]
-    P3 --> P4[Phase 4: Software Architecture & Dependency Inversion]
-    P3 --> P5[Phase 5: Stateful & Resilient Client-Server]
+flowchart LR
+    P1["PHASE 1 (45h)\nExecution Boundaries\n& Resources"] --> P2["PHASE 2 (45h)\nHardware Limits\n& Data Strategy"]
+    P1 --> P3["PHASE 3 (75h)\nConcurrency & Protocol\nFraming"]
+    P2 --> P3
+    P3 --> P4["PHASE 4 (105h)\nSoftware Architecture\n& Decomposition"]
+    P3 --> P5["PHASE 5 (90h)\nDistributed Resilience\n& Observability"]
     P4 --> P5
-    P5 --> M18[Month 18: Final Integration Crucible]
+    P5 --> BUF["TUẦN 13: BUFFER (30h)\n25/01 - 31/01\nTuần dự phòng rủi ro\nđộc lập"]
+
+    classDef phase fill:#1e293b,stroke:#38bdf8,stroke-width:2px,color:#f8fafc;
+    classDef buffer fill:#334155,stroke:#f59e0b,stroke-width:2px,stroke-dasharray: 5 5,color:#fef3c7;
+    class P1,P2,P3,P4,P5 phase;
+    class BUF buffer;
 ```
 
-### Phân Loại Dependency:
-- **Hard Dependency**: Bắt buộc hiểu A mới học được B.
-- **Soft Dependency**: A hỗ trợ B, nhưng B có thể học trước khi làm chủ A.
-- **Reinforcement**: A và B bổ trợ lẫn nhau, nên học gần nhau.
-- **Integration**: Dự án tổng hợp hợp nhất nhiều concept trước đó.
+* **Từ Phase 1 lên Phase 2 & 3**: Hiểu đơn vị cô lập cơ bản nhất (Process) và cơ chế tham chiếu tài nguyên (FD 3-tier) trước khi chuyển sang chia sẻ bộ nhớ (Threads) hoặc cơ chế ảo hóa phần cứng (Virtual Memory).
+* **Từ Phase 2 lên Phase 3**: Hiểu giới hạn vật lý của Cache Line và Memory Bus để lý giải nguyên nhân Lock Contention và False Sharing phá hủy thông lượng đa luồng.
+* **Từ Phase 3 lên Phase 4**: Trải nghiệm sự phức tạp khi Network I/O và Concurrency trộn lẫn vào logic nghiệp vụ để thấy rõ giá trị sống còn của Phân rã Module và Dependency Inversion.
+* **Từ Phase 4 lên Phase 5**: Ranh giới module sâu và độc lập là điều kiện tiên quyết để cô lập lỗi mạng và quản trị trạng thái trong môi trường phân tán.
 
 ---
 
-<a id="3-lộ-trình-chi-tiết-18-tháng-18-month-timeline"></a>
-## 3. Lộ Trình Chi Tiết 18 Tháng (18-Month Timeline)
+<a id="4-lộ-trình-thực-chiến-13-tuần--ngân-sách-giờ-13-week-backward-timeline"></a>
+## 4. Lộ Trình Thực Chiến 13 Tuần & Ngân Sách Giờ (13-Week Backward Timeline)
 
-| Giai đoạn | Thời gian | Tỷ trọng | Mục tiêu chính | Đồ án & Exit Gate |
-| :--- | :--- | :--- | :--- | :--- |
-| **Phase 0** | Tháng 1–2 | 10% | C++ Lifetime, RAII, Smart Pointers, [CMake](CMake) Toolchain Pipeline ([MIT Missing Semester](MIT_Missing_Semester) / [Modern C++ Docs](Modern_CPP_Docs)) | Multi-Module CLI Utility `[GATE 0]` |
-| **Phase 1** | Tháng 3–4 | 15% | Program vs Process, User/Kernel space, Syscalls, Fork/Exec/Wait ([OSTEP](OSTEP) / [Linux man 2 pages](Linux_Man2_Pages)) | Strict Mini-Shell `[GATE 1]` |
-| **Phase 2** | Tháng 5–6 | 15% | Cache Locality (Track A) & Virtual Memory / Page Faults (Track B) ([CS:APP](CSAPP) / [OSTEP](OSTEP)) | Locality Benchmark (AoS vs SoA) `[GATE 2]` |
-| **Phase 3** | Tháng 7–10 | 25% | Threads, Mutex/CV, Socket API, TCP Stream & Partial I/O Framing ([OSTEP Concurrency](OSTEP_Concurrency) / [Beej's Guide](Beej_Guide)) | Raw Socket Stateful Server `[GATE 3]` |
-| **Phase 4** | Tháng 11–13 | 15% | Coupling/Cohesion, Dependency Inversion, Unit Testing boundaries ([A Philosophy of Software Design](A_Philosophy_of_Software_Design) / [Clean Architecture](Clean_Architecture)) | The Great Refactoring `[GATE 4]` |
-| **Phase 5** | Tháng 14–17 | 20% | State Authority, Failure Detection/Handling, Backpressure, Observability ([Understanding Distributed Systems](Understanding_Distributed_Systems)) | Stateful Collaborative Server `[GATE 5]` |
-| **Crucible** | Tháng 18 | 5% | Interrogate unfamiliar black-box system, debug & measure | Core Complete |
+> **Ràng buộc cứng**: Hoàn thành toàn bộ lộ trình trước ngày **01/02/2027**.  
+> **Ngân sách chuẩn**: 30 giờ/tuần $\times$ 13 tuần = **390 giờ** (360 giờ học chủ động + 30 giờ Buffer độc lập).
 
----
+### Bảng Phân Bổ Ngân Sách Giờ & Hoạt Động Chi Tiết
 
-<a id="4-kế-hoạch-hàng-tháng--tiến-độ-month-by-month-progress-checklist"></a>
-## 4. Kế Hoạch Hàng Tháng & Tiến Độ (Month-by-Month Progress Checklist)
+| Phase | Thời gian lịch | Tổng giờ Phase | Đọc & Mô hình hóa | Thực nghiệm Toolchain | Case Study & ADR | Exit Gate Defense (Độc lập) |
+| :--- | :--- | :---: | :---: | :---: | :---: | :---: |
+| **Phase 1** | 01/11 ➔ 11/11/2026 | **45 giờ** | 15 giờ | 10 giờ | 13 giờ | **7 giờ** |
+| **Phase 2** | 12/11 ➔ 22/11/2026 | **45 giờ** | 12 giờ | 10 giờ | 15 giờ | **8 giờ** |
+| **Phase 3** | 23/11 ➔ 10/12/2026 | **75 giờ** | 20 giờ | 18 giờ | 25 giờ | **12 giờ** |
+| **Phase 4** | 11/12/2026 ➔ 04/01/2027 | **105 giờ** | 30 giờ | 20 giờ | 40 giờ | **15 giờ** |
+| **Phase 5** | 05/01 ➔ 24/01/2027 | **90 giờ** | 25 giờ | 20 giờ | 30 giờ | **15 giờ** |
+| **TỔNG HỌC CHỦ ĐỘNG** | **12 tuần** | **360 giờ** | **102 giờ** | **78 giờ** | **123 giờ** | **57 giờ** |
+| **TUẦN 13 (BUFFER WEEK)**| **25/01 ➔ 31/01/2027** | **30 giờ** | — | — | — | **Dự phòng rủi ro độc lập (30h)** |
+| **TỔNG CỘNG LỘ TRÌNH** | **13 tuần** | **390 giờ** | *Khóa cứng hạn chót hoàn thành trước ngày 01/02/2027* |
 
-- [ ] **Month 1**: C++ Lifetime, Storage Duration, Ownership, RAII concepts ([Modern C++ Documentation](Modern_CPP_Docs)), Memory debugging labs ([MIT Missing Semester](MIT_Missing_Semester)).
-- [ ] **Month 2**: Toolchain (Preprocessor ➔ Linker), [CMake](CMake) orchestration, Multi-module CLI project. `[GATE 0]`
-- [ ] **Month 3**: User vs. Kernel space, Process abstraction ([OSTEP Chapter 4](OSTEP_Ch4)), File Descriptors ([Linux man 2 pages](Linux_Man2_Pages)), Syscall observation ([strace](strace)).
-- [ ] **Month 4**: Process API ([OSTEP Chapter 5: Process API](OSTEP_Ch5) - `fork`/`exec`/`wait`), Mini-shell project. `[GATE 1]`
-- [ ] **Month 5**: Memory Layout, Cache Lines, Locality, Access Patterns ([CS:APP Chapter 6](CSAPP_Ch6)), [perf](perf) profiling.
-- [ ] **Month 6**: Virtual Memory, Address Translation, Page Fault mechanism ([OSTEP: Virtual Memory](OSTEP_VM)), Locality benchmark project. `[GATE 2]`
-- [ ] **Month 7**: Thread Execution, Shared State, Race Conditions ([OSTEP Concurrency](OSTEP_Concurrency)), [TSan](ThreadSanitizer) lab.
-- [ ] **Month 8**: Mutex, Condition Variables ([OSTEP Chapter 30: Condition Variables](OSTEP_Ch30) - Predicate waiting), Invariant protection, Thread Pool resource limits.
-- [ ] **Month 9**: Socket API ([Beej's Guide to Network Programming](Beej_Guide)), TCP stream semantics, Partial Read/Write framing labs.
-- [ ] **Month 10**: Integration: Raw Socket Stateful Server project ([Beej's Guide](Beej_Guide)). `[GATE 3]`
-- [ ] **Month 11**: Coupling/Cohesion, Information Hiding, Deep Modules ([A Philosophy of Software Design](A_Philosophy_of_Software_Design)).
-- [ ] **Month 12**: Dependency Direction vs. Injection ([Clean Architecture](Clean_Architecture)), Unit testing boundaries.
-- [ ] **Month 13**: The Great Refactoring project. `[GATE 4]`
-- [ ] **Month 14**: State Authority, Trust boundaries, Invalid state handling ([Understanding Distributed Systems](Understanding_Distributed_Systems)).
-- [ ] **Month 15**: Failure Detection vs. Failure Handling ([Understanding Distributed Systems](Understanding_Distributed_Systems)), Stale state cleanup synchronization.
-- [ ] **Month 16**: Resource limits, Bounded Queues, Backpressure policies, Observability concepts.
-- [ ] **Month 17**: Stateful Collaborative Server project, Fault injection testing. `[GATE 5]`
-- [ ] **Month 18**: Final Integration Crucible — Black-box system interrogation. `[CORE COMPLETE]`
+### Đối Chiếu Thực Tế Nền Tảng Của Người Học
+1. **Đã thành thạo (C++ RAII, Toolchain, CMake)**: Kiểm tra nhanh, zero-budget học lại; áp dụng ngay vào đọc hiểu codebase.
+2. **Đã học (Day 001–003: User/Kernel mode, Process VAS, basic fork/exec/wait, UID/GID)**: Dành 5 giờ rà soát kiểm tra ranh giới, không học lại từ đầu.
+3. **Đã học nhưng chưa vững (Mô hình 3 tầng FD, CLOEXEC race, Pipe Flow Control)**: Dành 10 giờ củng cố trọng điểm về invariants và causal mechanisms.
+4. **Chưa học (Hardware Cache, Concurrency Invariants, Software Architecture, Distributed Resilience)**: Phân bổ trọn vẹn thời gian học mới theo chuẩn System Architect.
 
 ---
 
-<a id="5-thực-thi-hàng-tuần---mẫu-tháng-9-weekly-execution-prototype"></a>
-## 5. Thực Thi Hàng Tuần - Mẫu Tháng 9 (Weekly Execution Prototype)
+<a id="5-nguyên-tắc-thiết-kế-thực-hành--cấu-trúc-labs--exit-gates-hands-on-c-engineering-principles"></a>
+## 5. Nguyên Tắc Thiết Kế Thực Hành & Cấu Trúc Labs / Exit Gates (Hands-on C++ Engineering Principles)
 
-> **Chủ đề Tháng 9**: TCP Sockets & Framing
+> **Mục tiêu thực hành cốt lõi**: Giảm tối đa độ phức tạp triển khai không cần thiết (không viết parser chuỗi, không làm framework lớn), nhưng **giữ vững 100% tính thực hành chủ động**. Người học **tự tay viết code C++, tự compile trên Linux/WSL2, tự kích hoạt lỗi, tự debug và đo đạc** để hiểu thấu đáo cơ chế hệ thống.
 
-- [ ] **Week 1: Mechanism & Break**
-  - *Mục tiêu*: Hiểu mapping từ File Descriptor sang Socket và bản chất byte-stream của TCP.
-  - *Tài liệu*: [Beej's Guide to Network Programming](Beej_Guide) (Sockets, Bind, Listen, Accept).
-  - *Lab*: Viết basic echo client/server. Cố tình gửi buffer cực lớn để phá vỡ giả định 1:1 send/recv.
-  - *Debugging*: Quan sát phân mảnh gói tin (packet fragmentation).
-- [ ] **Week 2: Observe & Hypothesize**
-  - *Mục tiêu*: Làm chủ Partial I/O và Framing.
-  - *Nhiệm vụ*: Bẫy Partial Read (ép client `send()` từng byte chậm).
-  - *Debugging*: Giả thuyết trạng thái buffer và tái cấu trúc tin nhắn ở tầng ứng dụng.
-- [ ] **Week 3: Implementation**
-  - *Mục tiêu*: Hiện thực Protocol Layer bền vững.
-  - *Nhiệm vụ*: Viết state-machine parsing dạng length-prefixed để gom byte stream thành logical message.
-  - *Bằng chứng*: Unit test chứng minh mảng byte bị phân mảnh được parse thành công.
-- [ ] **Week 4: Integration & Gate Prep**
-  - *Mục tiêu*: Kết nối framed I/O với application state.
-  - *Nhiệm vụ*: Xử lý partial write và kết thúc kết nối êm đẹp (graceful teardown).
-  - *Bằng chứng*: Chạy sạch sẽ với [Valgrind](Valgrind)/[TSan](ThreadSanitizer) dưới tải cao.
+### 5.1. Bốn Nguyên Tắc Thiết Kế Thực Hành
+1. **Không lý thuyết suông — Ưu tiên C++ trên Linux/WSL2**: Mọi khái niệm Systems đều được kiểm chứng bằng một chương trình C++ nhỏ do người học tự viết và chạy trực tiếp. Tuyệt đối không thay thế C++ bằng Python chỉ vì tiện lợi, trừ khi có lý do đặc thù.
+2. **Prototype nhỏ chứng minh cơ chế (50–120 dòng code)**: Loại bỏ các bài tập xây dựng sản phẩm hoàn chỉnh cồng kềnh. Một prototype C++ tinh gọn (ví dụ: runner `cmd1 | cmd2` 70 dòng) là hoàn toàn đủ để làm chủ `pipe()`, `dup2()` và `fork()`, không cần viết cả một Shell parser 1000 dòng.
+3. **Cấu trúc chuẩn của mỗi Lab (4 thành tố bắt buộc)**:
+   - **Cơ chế cần hiểu**: Hiện tượng hoặc quy luật hệ thống cần làm sáng tỏ.
+   - **Tự triển khai bằng C++**: Phần code người học tự tay viết từ đầu hoặc chỉnh sửa trực tiếp.
+   - **Quan sát / Đo đạc bằng công cụ**: Sử dụng `strace`, `perf`, `gdb`, `TSan` hoặc `/usr/bin/time -v` để nhìn thấy trạng thái kernel/phần cứng.
+   - **Tiêu chí xác nhận kết quả**: Điều kiện định lượng để xác nhận bài tập thành công.
+4. **Cấu trúc chuẩn của Exit Gate (4 chiều đánh giá)**:
+   - **Giải thích cơ chế**: Dùng ngôn ngữ và mô hình của mình để giải thích nguyên lý nhân quả.
+   - **Tự viết / Chỉnh sửa code C++ nhỏ**: Thao tác trực tiếp trên mã nguồn để hiện thực hóa hoặc sửa lỗi.
+   - **Dự đoán & Kiểm chứng thực nghiệm**: Đưa ra giả thuyết trước khi chạy, sau đó đo lường để đối chiếu.
+   - **Phân tích lỗi (Break-Check)**: Chủ động làm hỏng hệ thống (gây deadlock, race condition, handle leak) và giải thích nguyên nhân gốc rễ.
 
 ---
 
-<a id="6-danh-sách-đồ-án-lớn-project-specifications"></a>
-## 6. Danh Sách Đồ Án Lớn (Project Specifications)
+<a id="6-nội-dung-chi-tiết-từng-phase-kiểm-toán--phạm-vi-phẫu-thuật"></a>
+## 6. Nội Dung Chi Tiết Từng Phase: Kiểm Toán & Phạm Vi Phẫu Thuật
 
-### Project 1: Multi-Module CLI Utility (Phase 0)
-- **Mục tiêu**: Xây dựng phần mềm C++ đa module quản lý bằng [CMake](CMake) với quyền sở hữu RAII nghiêm ngặt ([MIT Missing Semester](MIT_Missing_Semester)).
-- **Kiến trúc**: Core Static Library + CLI Executable.
-- **Tiêu chuẩn nghiệm thu**: Biên dịch sạch sẽ; không rò rỉ bộ nhớ/truy cập bất hợp lệ dưới [Valgrind](Valgrind)/[ASan](Valgrind_ASan); không dùng `raw new/delete`.
+### PHASE 1: Execution Boundaries, Resource Lifecycles & Access Control (45 Giờ)
+> **Trọng tâm**: Ranh giới thực thi, cô lập lỗi (Process), vòng đời tham chiếu tài nguyên (3-Tier Model), và điều tiết dòng chảy (Pipe Flow Control).
 
-### Project 2: Strict Mini-Shell (Phase 1)
-- **Mục tiêu**: Thể hiện việc tạo process OS và trừu tượng hóa system call.
-- **Kiến trúc**: Parse ➔ Fork ➔ Exec ➔ Wait.
-- **Tiêu chuẩn nghiệm thu**: Xử lý đúng thất bại của `fork`/`exec`, thu dọn child process (tránh Zombie), báo cáo chính xác exit status.
-
-### Project 3: Locality Benchmark (Phase 2)
-- **Mục tiêu**: Đo lường ảnh hưởng của cache vật lý tới hiệu năng dựa trên layout bộ nhớ.
-- **Kiến trúc**: So sánh cùng logic trên 2 layout: AoS (Array of Structures) vs SoA (Structure of Arrays).
-- **Tiêu chuẩn nghiệm thu**: Báo cáo thực nghiệm chứng minh sự khác biệt hiệu năng trên tập dữ liệu đủ lớn ([CS:APP Chapter 6](CSAPP_Ch6)); giải thích nguyên nhân bằng cache lines qua [perf](perf).
-
-### Project 4: Raw Socket Stateful Server (Phase 3)
-- **Mục tiêu**: Quản lý thực thi đồng thời và luồng byte TCP thô.
-- **Kiến trúc**: Multi-threaded Server xử lý nhiều clients.
-- **Tiêu chuẩn nghiệm thu**: Xử lý đồng thời, buffer đúng partial reads/writes ([Beej's Guide](Beej_Guide)), vượt qua kiểm tra rượt đuổi dữ liệu (data races) của [ThreadSanitizer](ThreadSanitizer), giải quyết deadlock scenarios.
-
-### Project 5: The Great Refactoring (Phase 4)
-- **Mục tiêu**: Áp dụng Dependency Direction và cô lập ranh giới module ([A Philosophy of Software Design](A_Philosophy_of_Software_Design) / [Clean Architecture](Clean_Architecture)).
-- **Kiến trúc**: Network Layer ➔ Protocol Layer ➔ Application Layer.
-- **Tiêu chuẩn nghiệm thu**: Core application policy không phụ thuộc trực tiếp vào Network API; Unit tests kiểm tra framing/state invariants chạy hoàn toàn trên bộ nhớ (không cần I/O mạng).
-
-### Project 6: Stateful Collaborative Server (Phase 5)
-- **Mục tiêu**: Xây dựng hệ thống Client-Server resilient, state-authoritative ([Understanding Distributed Systems](Understanding_Distributed_Systems)).
-- **Tính năng**: State validation, failure detection, cleanup synchronization, backpressure.
-- **Tiêu chuẩn nghiệm thu**: Từ chối state proposal bất hợp lệ; phát hiện client ngắt kết nối; dọn dẹp stale state an toàn; áp dụng chính sách Backpressure (reject/drop/throttle) khi queue tràn.
+| Chủ đề | Quyết định | 1. Principles & Reasoning (Năng lực Kiến trúc) | 2. Mechanisms & Models (Mô hình kỹ thuật) | 3. Implementation Details (Chỉ tra cứu) |
+| :--- | :---: | :--- | :--- | :--- |
+| **Privilege Boundaries & Syscalls** | **HỌC** | **Security & Fault Containment**: Tại sao cần tách biệt đặc quyền; chi phí context switch; ranh giới tin cậy (Trust Boundary). | Mô hình 2 chế độ (User mode vs Kernel mode); cơ chế chuyển giao kiểm soát an toàn qua syscall gate. | Mã thanh ghi CPU (`RAX`, `RDI`), bảng vector ngắt, lệnh assembly `syscall`. |
+| **Process Model & Address Space** | **HỌC** | **Isolation Boundary**: Không gian địa chỉ ảo là ranh giới cô lập lỗi tối thượng trên một node; một tiến trình sập không thể làm hỏng bộ nhớ tiến trình khác. | Phân vùng không gian địa chỉ tiến trình (Text, Data, Heap, Stack); mô hình bảo vệ bộ nhớ ảo. | Bit layout của thanh ghi MMU, địa chỉ hex cụ thể của kernel mapping. |
+| **Process Lifecycle & Supervision** | **HỌC** | **Lifecycle Management & Resource Leaks**: Trách nhiệm của coordinator/parent; bài toán rò rỉ tài nguyên khi tiến trình con chết bất thường (zombie, orphan); graceful shutdown. | Mô hình nhân bản thực thi (`fork`), thay thế image (`execve`), và thu dọn trạng thái (`waitpid`). | Cờ chi tiết của `waitid`, các macro kiểm tra mã thoát hiếm gặp. |
+| **Credentials & Access Control** | **HỌC** | **Least Privilege & Multi-tenancy**: Nguyên lý đặc quyền tối thiểu; cách thiết lập ranh giới phân quyền cho ứng dụng chạy đa người dùng/dịch vụ. | Phân định Real ID (quyền sở hữu) vs Effective ID (quyền thực thi); cơ chế drop privileges an toàn. | Các hàm phụ trợ `setresuid`, bảng số permission octal chi tiết. |
+| **Resource Handles & 3-Tier Model** | **HỌC** | **Resource Ownership & Multiplexing**: Tài nguyên tồn tại độc lập với handle tham chiếu; reference counting; bài toán rò rỉ tài nguyên do chia sẻ handle qua ranh giới. | Mô hình 3 tầng POSIX: Bảng FD cục bộ tiến trình ➔ Bảng Open File Description toàn hệ thống ➔ Inode/vnode. | Số hiệu int của FD (0, 1, 2), cú pháp gọi hàm `fcntl`. |
+| **Handle Inheritance & CLOEXEC** | **HỌC** | **Information Disclosure across Boundaries**: Nguy cơ rò rỉ tài nguyên bí mật sang tiến trình con; bài toán Race Condition trong thiết kế API khi chạy đa luồng. | Kế thừa handle qua `execve`; cờ `FD_CLOEXEC` / `O_CLOEXEC`; nguyên tắc thiết kế API nguyên tử (atomic API design). | Cú pháp `ioctl`, các cờ mở rộng riêng của Linux. |
+| **Pipes & Stream Flow Control** | **HỌC** | **Backpressure & Bounded Buffers**: Mô hình đường ống dữ liệu (Data Pipeline); cơ chế tự điều tiết dòng chảy (Producer bị block khi Consumer xử lý chậm vì buffer đầy). | Kernel pipe buffer; tín hiệu EOF khi toàn bộ write-ends đóng; tín hiệu đứt gãy kết nối (`SIGPIPE`). | Dung lượng byte chính xác của `PIPE_BUF` trên từng distro Linux. |
+| **Asynchronous Signals** | **HỌC** | **Interruption & Graceful Teardown**: Giao thức tối thiểu giữa OS và ứng dụng để yêu cầu dừng an toàn; trạng thái gián đoạn bất đồng bộ. | Xử lý ngắt cơ bản (`SIGINT`, `SIGTERM`, `SIGCHLD`); nguyên tắc Async-Signal-Safety (chỉ thao tác an toàn khi bị ngắt). | Chi tiết `sigaction` flags chuyên sâu, `sigaltstack`, signal masking bitmasks. |
+| *Hardware Protection Tables (GDT, IDT, TSS)* | **KHÔNG HỌC** | — | — | **Lý do**: Chi tiết cơ khí x86; không giúp kiến trúc sư đưa ra quyết định tốt hơn về ranh giới hay cô lập tài nguyên. |
+| *Complex Signal IPC (Real-time signals, queues)* | **KHÔNG HỌC** | — | — | **Lý do**: Signal IPC mang nhiều lỗi tiềm ẩn và khó debug; kiến trúc hiện đại dùng event loop, domain sockets và message queues. |
 
 ---
 
-<a id="7-bộ-công-cụ-chuẩn--môi-trường-debug-toolchain--environment"></a>
-## 7. Bộ Công Cụ Chuẩn & Môi Trường Debug (Toolchain & Environment)
+### PHASE 2: Physical Limits, Data Dynamics & Storage Trade-offs (45 Giờ)
+> **Trọng tâm**: Giới hạn vật lý phần cứng, độ trễ Cache/RAM, đánh đổi cấu trúc dữ liệu (AoS vs SoA), áp lực bộ nhớ và chiến lược Caching.
 
-> **Môi trường chuẩn**: Windows Host + Linux (WSL2 hoặc Native) + VS Code Editor.
+| Chủ đề | Quyết định | 1. Principles & Reasoning (Năng lực Kiến trúc) | 2. Mechanisms & Models (Mô hình kỹ thuật) | 3. Implementation Details (Chỉ tra cứu) |
+| :--- | :---: | :--- | :--- | :--- |
+| **Memory Latency Hierarchy & Locality** | **HỌC** | **Mechanical Sympathy & Latency Scaling**: Chi phí vật lý của việc nhảy con trỏ ngẫu nhiên (Pointer Chasing) vs duyệt tuần tự; độ trễ Cache (vài ns) vs RAM (hàng chục ns). | Mô hình phân tầng bộ nhớ (Registers ➔ L1/L2/L3 ➔ RAM); Cache Line (64 bytes); Spatial & Temporal Locality. | Dung lượng cache chi tiết của từng dòng CPU; bảng chu kỳ xung nhịp (clock cycles). |
+| **Data Layout Trade-offs (AoS vs. SoA)** | **HỌC** | **Data Architecture Trade-offs**: Đánh đổi giữa tính bao đóng của OOP (AoS - tiện cho dev) và hiệu suất băng thông bộ nhớ (SoA - tối ưu cho batch processing). | Bố cục bộ nhớ AoS vs SoA; Memory Alignment và Padding (khoảng đệm căn chỉnh byte). | Chỉ thị compiler `__attribute__((aligned))`, cú pháp `alignas`. |
+| **Virtual Memory, Page Faults & Thrashing** | **HỌC** | **Capacity Overcommitment & Degradation**: Ảo hóa bộ nhớ cho phép chạy vượt dung lượng RAM thật nhưng trả giá bằng hiệu năng sụp đổ khi bị tráo đổi trang (Thrashing); OOM Killer. | Khái niệm Page (4KB); Minor vs Major Page Fault; Working Set của ứng dụng; Cơ chế Swap và rủi ro OOM. | Thuật toán page replacement nội bộ của kernel; cấu trúc bit của Page Table Entry (PTE). |
+| **Caching Strategies & Invalidation** | **HỌC** | **Cache Architecture**: Các mẫu thiết kế Cache (Cache-aside, Write-through, Write-back); bài toán Cache Invalidation và rủi ro dữ liệu cũ (stale data). | Hit rate, Miss penalty, Eviction policies (LRU, LFU cơ bản), Invalidation patterns. | Cấu hình tham số chi tiết của Redis/Memcached. |
+| *Custom Memory Allocators (Buddy, Slab from scratch)* | **KHÔNG HỌC** | — | — | **Lý do**: Kiến trúc sư cần hiểu hành vi của allocator (phân mảnh, lock contention) để chọn `jemalloc`/`tcmalloc`, không cần tự tay code allocator. |
+| *Assembly-level CPU Profiling & Instruction Decoding* | **KHÔNG HỌC** | — | — | **Lý do**: Phạm vi của kỹ sư compiler/micro-architecture. Kiến trúc sư chỉ cần đo đạc ở mức metrics (Cache Miss Rate, Memory Bandwidth). |
 
-| Công cụ | Tầng hoạt động | Mục đích sử dụng |
+---
+
+### PHASE 3: Concurrency Invariants, Communication Protocols & Contention (75 Giờ)
+> **Trọng tâm**: Bất biến trạng thái đồng thời (State Invariants), Deadlock, Bounded Thread Pool và Protocol Framing trên TCP byte-stream.
+
+| Chủ đề | Quyết định | 1. Principles & Reasoning (Năng lực Kiến trúc) | 2. Mechanisms & Models (Mô hình kỹ thuật) | 3. Implementation Details (Chỉ tra cứu) |
+| :--- | :---: | :--- | :--- | :--- |
+| **Concurrency Models (Process vs. Thread vs. Event-Loop)** | **HỌC** | **Concurrency Paradigm Selection**: Đánh đổi giữa Cô lập bộ nhớ / Chi phí IPC (Process) vs Chia sẻ bộ nhớ / Rủi ro hỏng dữ liệu (Thread) vs I/O thông lượng cao (Event-driven). | Mô hình thực thi chia sẻ Heap/Data; chi phí context switch; non-blocking I/O multiplexing. | Cờ hàm `clone()`, cấu hình CPU thread affinity chi tiết. |
+| **Shared State Invariants & Race Conditions** | **HỌC** | **State Integrity & Critical Sections**: Xác định bất biến trạng thái (Invariants); nhận diện thời điểm dữ liệu bị rơi vào trạng thái trung gian không hợp lệ do chạy đồng thời. | Data Race vs Race Condition; Vùng tranh chấp (Critical Section); Tính nguyên tử (Atomicity) ở mức logic. | Cú pháp gán biến atomic C++, macro compiler memory barriers. |
+| **Coordination & Mutual Exclusion** | **HỌC** | **Contention vs. Throughput & Deadlock**: Đánh đổi giữa bảo vệ tính đúng đắn và thắt cổ chai hiệu năng; 4 điều kiện sinh Deadlock và chiến lược phòng chống deadlock. | Khóa loại trừ (Mutex), Biến điều kiện (Condition Variable - Predicate Loop), Read-Write Lock, Hàng đợi chờ. | Cú pháp `pthread_mutex_init`, các flags thuộc tính mutex nâng cao. |
+| **Resource Bounding: Thread Pool & Task Queues** | **HỌC** | **Resource Exhaustion Prevention**: Chống sụp đổ hệ thống bằng cách giới hạn tài nguyên tính toán; chính sách xử lý khi hàng đợi tác vụ quá tải. | Mô hình Producer-Consumer; Hàng đợi có giới hạn (Bounded Queue); Worker Thread Pool; Chính sách loại bỏ tác vụ (Rejection policy). | Thuật toán Work-stealing nội bộ chi tiết, cấu trúc con trỏ ring buffer vi mô. |
+| **Network Boundary & Sockets** | **HỌC** | **Crossing Machine Boundaries**: Ranh giới giao tiếp qua mạng; sự chuyển dịch từ môi trường tin cậy (bộ nhớ trong) sang môi trường có độ trễ và mất gói. | Mô hình Client-Server; Socket abstraction; Vòng đời kết nối TCP (3-way handshake, Established, Teardown). | Cấu trúc `sockaddr_in`, các hàm `htons`/`ntohs`, các socket options hiếm dùng. |
+| **Stream Semantics & Application-Level Framing** | **HỌC** | **Protocol Invariants over Byte Streams**: TCP là dòng byte liên tục, không có ranh giới gói tin; ứng dụng bắt buộc phải tự thiết kế giao thức đóng gói (Framing) tin cậy. | Hiện tượng dồn gói/phân mảnh (Packet fragmentation); Hiện tượng đọc/ghi một phần (Partial Read/Write); Giao thức Length-prefixed vs Delimiter. | Cấu hình kích thước TCP window `SO_RCVBUF`, thuật toán Nagle (`TCP_NODELAY`) trừ khi gặp vấn đề về latency. |
+| *Lock-free Data Structures & C++ Memory Ordering (`memory_order_*`)* | **KHÔNG HỌC** | — | — | **Lý do**: Tối ưu hóa vi mô với độ phức tạp nhận thức quá lớn. 99% kiến trúc hệ thống quy mô lớn sử dụng lock có cấu trúc, queue hoặc actor model. |
+| *Raw Sockets & Thủ công can thiệp IP/TCP Headers* | **KHÔNG HỌC** | — | — | **Lý do**: Lĩnh vực chuyên biệt của network driver và bảo mật mạng. Kiến trúc sư làm việc từ transport/session layer trở lên. |
+
+---
+
+### PHASE 4: Software Architecture, System Decomposition & Decision Frameworks (105 Giờ)
+> **Trọng tâm**: Phân rã hệ thống (Deep Modules), Đảo ngược phụ thuộc (Clean/Hexagonal Architecture), định lượng Quality Attributes, viết ADR và thiết kế ranh giới kiểm thử in-memory.
+
+| Chủ đề | Quyết định | 1. Principles & Reasoning (Năng lực Kiến trúc) | 2. Mechanisms & Models (Mô hình kỹ thuật) | 3. Implementation Details (Chỉ tra cứu) |
+| :--- | :---: | :--- | :--- | :--- |
+| **Information Hiding & Deep Modules** | **HỌC** | **Complexity Management**: Module sâu (Giao diện đơn giản, hiện thực mạnh mẽ) vs Module nông; giảm thiểu thay đổi lan truyền (Change Amplification); "Define errors out of existence". | Nguyên lý che giấu thông tin; trừu tượng hóa hành vi; thiết kế giao diện tối giản. | Cú pháp C++ PIMPL idiom, các từ khóa truy cập `private`/`protected`. |
+| **Coupling, Cohesion & Dependency Direction** | **HỌC** | **Stability & Independent Evolution**: Phân loại mức độ kết dính (Cohesion) và độ phụ thuộc (Coupling); quy luật luồng phụ thuộc: luôn hướng từ chi tiết biến động về phía chính sách ổn định. | Metric đánh giá coupling; phát hiện và bẻ gãy chu trình phụ thuộc (Circular dependencies). | Cấu trúc include guards, forward declarations trong C++. |
+| **Boundary Design & Dependency Inversion** | **HỌC** | **Policy vs. Mechanism Decoupling**: Tách rời Logic nghiệp vụ (Core Policy) khỏi Chi tiết phân phối (Network Sockets, Storage, UI); Hexagonal Architecture (Ports & Adapters). | Interfaces / Abstract contracts; Dependency Injection; Data Transfer Objects (DTOs) làm ranh giới dữ liệu. | Các framework Dependency Injection container phức tạp. |
+| **Requirements & Quality Attributes** | **HỌC** | **Architectural Quantification**: Định lượng Latency (p50, p95, p99), Throughput, Availability, Scalability, Maintainability; xây dựng kịch bản thuộc tính chất lượng (Quality Attribute Scenarios). | Kỹ thuật phỏng vấn kiến trúc, Trade-off matrix, định lượng SLO/SLA. | Các mẫu template tài liệu doanh nghiệp cồng kềnh. |
+| **Engineering Decision-Making (ADRs)** | **HỌC** | **Architectural Documentation**: Kỹ năng lập hồ sơ quyết định kiến trúc (**Architecture Decision Records**); ghi nhận bối cảnh, phương án thay thế, trade-offs và hệ quả. | Cấu trúc chuẩn ADR (Context, Decision, Consequences, Alternatives Considered). | Công cụ quản lý ADR tự động. |
+| **Architectural Testability** | **HỌC** | **Fast Deterministic Verification**: Đánh giá chất lượng kiến trúc bằng khả năng kiểm thử; ranh giới tốt cho phép test 100% logic trong RAM mà không cần dựng mạng hay database thật. | Ranh giới Unit Test; Test Doubles (Mocks, Stubs, Fakes); In-Memory Simulation. | Cú pháp matchers của GoogleTest, Catch2. |
+| *23 GoF Design Patterns (Thuộc lòng và áp dụng máy móc)* | **KHÔNG HỌC** | — | — | **Lý do**: Dẫn đến overengineering, sinh ra hàng loạt class nông (shallow classes) làm rối loạn kiến trúc. Tập trung vào Deep Modules và Boundary Isolation. |
+
+---
+
+### PHASE 5: Distributed Systems, Resilience, Observability & Incident Diagnostics (90 Giờ)
+> **Trọng tâm**: Thẩm quyền trạng thái (State Authority), lỗi mạng cục bộ (Partial Failures), cơ chế tự vệ (Backpressure), Observability toàn diện và chẩn đoán sự cố (Incident Post-Mortem).
+
+| Chủ đề | Quyết định | 1. Principles & Reasoning (Năng lực Kiến trúc) | 2. Mechanisms & Models (Mô hình kỹ thuật) | 3. Implementation Details (Chỉ tra cứu) |
+| :--- | :---: | :--- | :--- | :--- |
+| **State Authority & Trust Boundaries** | **HỌC** | **Single Source of Truth**: Ai sở hữu quyền thay đổi trạng thái? Phân định ranh giới tin cậy giữa Client (không đáng tin) và Server (nắm quyền thẩm định); chống xung đột trạng thái. | State Validation; Authoritative State Store vs. Speculative Client State; Từ chối các đề xuất trạng thái bất hợp lệ. | Cú pháp serialize/deserialize JSON, Protobuf. |
+| **Distributed Failure Modes & Partial Failures** | **HỌC** | **Design for Failure**: Trong hệ thống phân tán, lỗi luôn xảy ra một phần (mạng đứt, node crash, message thất lạc hoặc lặp lại); chấp nhận sự bất định của thời gian mạng. | Mô hình lỗi phân tán: Crash-stop vs Crash-recovery; Mất gói, Nhân bản gói tin; Phân vùng mạng (Network Partition). | Cấu hình tường lửa `iptables`, công cụ mô phỏng lag mạng. |
+| **Failure Detection vs. Failure Handling** | **HỌC** | **Detection vs Mitigation**: Nhận biết một nút đã chết khác hoàn toàn với việc quyết định làm gì sau đó; tránh hành động phản ứng vội vã gây ra bão kết nối (Thundering Herd). | Cơ chế Heartbeat; Quá hạn (Timeouts); Đổi mới hạn thuê (Lease renewal); Dọn dẹp tài nguyên treo (Stale state cleanup); Exponential Backoff + Jitter. | Giá trị hằng số mili-giây cụ thể của timeout. |
+| **System Self-Defense: Backpressure & Load Shedding** | **HỌC** | **Cascading Failure Prevention**: Khi tài nguyên đến giới hạn, hệ thống bắt buộc phải từ chối một phần việc để cứu phần còn lại; thà làm hỏng một số request có kiểm soát còn hơn để toàn bộ hệ thống sụp đổ. | Chính sách điều tiết: Chặn (Block) vs Hủy yêu cầu mới nhất (Drop tail) vs Hủy yêu cầu cũ nhất (Drop head) vs Từ chối tường minh (Reject / HTTP 429/503); Circuit Breaker. | Tham số cấu hình Nginx, Envoy proxy rate limiter. |
+| **Distributed Consistency Models** | **HỌC** | **Fundamental Distributed Trade-offs**: Không thể có đồng thời dữ liệu nhất quán tuyệt đối và tính sẵn sàng cao khi mạng bị phân vùng; hiểu đánh đổi giữa Strong Consistency và Eventual Consistency. | Định lý CAP, PACELC; Mô hình Quorum cơ bản ($R + W > N$); Read-your-own-writes. | Chứng minh toán học hình thức của các mô hình phân tán. |
+| **Observability Strategy** | **HỌC** | **System Telemetry**: Ba trụ cột: Metrics (Counters, Gauges, Histograms - đo p99), Structured Logs (truy vết ngữ cảnh), Distributed Tracing (Span ID, Trace ID); Health checks (Liveness vs Readiness). | OpenTelemetry concepts, Log aggregation, Trace propagation xuyên ranh giới dịch vụ. | Cú pháp cấu hình Grafana, Prometheus cụ thể. |
+| **Incident Diagnostics & Post-Mortem** | **HỌC** | **Root Cause Analysis**: Phương pháp điều tra sự cố dựa trên giả thuyết; trích xuất telemetry để tái hiện timeline; viết Post-Mortem chuẩn văn hóa SRE/Architecture không đổ lỗi (Blameless Post-Mortem). | Timeline reconstruction, 5 Whys, Action items phòng ngừa sự cố lặp lại. | Mẫu biểu báo cáo nội bộ doanh nghiệp. |
+| *Tự code thuật toán Raft / Paxos Consensus from scratch* | **KHÔNG HỌC** | — | — | **Lý do**: Tốn hàng tháng để debug lỗi trạng thái vi mô. Kỹ sư kiến trúc cần hiểu invariant và failure modes của Leader Election và Quorum để áp dụng, không cần tự viết consensus engine. |
+| *Distributed Transactions (2-Phase Commit 2PC Implementation)* | **KHÔNG HỌC** | — | — | **Lý do**: 2PC là giao thức blocking dễ làm tê liệt hệ thống, hiếm khi dùng trong kiến trúc hiện đại. Chỉ cần hiểu lý do vì sao nó gây nghẽn (Explain). |
+
+---
+
+<a id="7-tài-liệu-học-tập-chuẩn-mực--phạm-vi-đọc-tinh-gọn-canonical-reading-scope"></a>
+## 7. Tài Liệu Học Tập Chuẩn Mực & Phạm Vi Đọc Tinh Gọn (Canonical Reading Scope)
+
+Chỉ đọc đúng các chương mục tiêu (dưới 40–50 trang mỗi Phase); tuyệt đối không đọc dàn trải:
+
+| Giai đoạn | Tác phẩm chuẩn mực (Canonical Sources) | Phạm vi đọc thực tế (Chỉ đọc các phần này) | Phần bỏ qua (Không đọc để tránh lãng phí) |
+| :--- | :--- | :--- | :--- |
+| **Phase 1** | **OSTEP** (Remzi Arpaci-Dusseau)<br>**TLPI** (Michael Kerrisk) | • **OSTEP**: Ch. 4 (Processes), Ch. 5 (Process API: `fork`, `exec`, `wait`).<br>• **TLPI**: Ch. 44 (Pipes: mục 44.1, 44.2 về blocking & buffer). | Bỏ qua File System Internals, Terminal I/O, Advanced POSIX IPC, Xử lý signal chuyên sâu. |
+| **Phase 2** | **CS:APP** (Bryant & O'Hallaron)<br>**Tài liệu kinh điển Online** | • **CS:APP**: Ch. 6 (Memory Hierarchy & Locality: mục 6.1–6.4).<br>• **Interactive**: *Latency Numbers Every Programmer Should Know*. | Bỏ qua Ch. 3 (Assembly), Ch. 4 (Processor Architecture), Ch. 9 (Tự viết Malloc Allocator). |
+| **Phase 3** | **OSTEP**<br>**Beej's Guide to Network Programming** | • **OSTEP**: Ch. 28 (Locks), Ch. 30 (Condition Variables: Producer-Consumer).<br>• **Beej's Guide**: Ch. 5, 6 (Socket API & Client-Server Basics). | Bỏ qua Semaphore internals phức tạp, Lock-free algorithms, Raw Sockets, IPv6 header manipulation chi tiết. |
+| **Phase 4** | **A Philosophy of Software Design** (John Ousterhout)<br>**Clean Architecture** (Robert C. Martin) | • **Philosophy of Software Design**: Ch. 2, 4, 5, 6, 10 (Deep Modules, Information Hiding).<br>• **Clean Architecture**: Ch. 15, 19, 22 (Architecture, Policy, Clean Architecture). | Bỏ qua các tranh cãi giáo điều về OOP vs Functional; không học thuộc các catalog design pattern lỗi thời. |
+| **Phase 5** | **Designing Data-Intensive Applications** (Martin Kleppmann)<br>**Understanding Distributed Systems** (Roberto Vitillo) | • **DDIA**: Ch. 1 (Reliable, Scalable, Maintainable), Ch. 8 (The Trouble with Distributed Systems).<br>• **Vitillo**: Mục Resiliency (Timeouts, Retries, Circuit Breaker, Backpressure). | Bỏ qua Ch. 3 DDIA (Storage Engines B-Tree/LSM-Tree Internals), Proofs toán học của Consensus, Batch/Stream frameworks (Hadoop, Flink). |
+
+---
+
+<a id="8-danh-sách-5-đồ-án-kiến-trúc--tiêu-chuẩn-exit-gates-architectural-case-projects"></a>
+## 8. Danh Sách 5 Đồ Án Kiến Trúc & Tiêu Chuẩn Exit Gates (Hands-on C++ Prototypes)
+
+Mọi đồ án đều là **Prototype C++ tinh gọn (50–120 dòng code)** do người học tự tay triển khai, biên dịch và chạy trên Linux/WSL2. Exit Gates đánh giá trực tiếp trên 4 chiều: **Giải thích cơ chế**, **Viết/chỉnh sửa code C++**, **Dự đoán & Đo đạc**, và **Phân tích lỗi (Break-Check)**.
+
+---
+
+### Project 1: Mini-Shell — C++ Systems Integration Project (10 Giờ) (Phase 1)
+Project thực hành tích hợp sau khi hoàn thành các bài về Process, `execve`, File Descriptors và Pipe trong Phase 1.
+
+#### 1. Mục tiêu
+Tự xây dựng một Mini-Shell bằng C++ trên Linux/WSL2, nhằm tích hợp kiến thức về process lifecycle, program execution, file descriptor management và IPC.
+Sau khi hoàn thành, người học có thể:
+- Hiểu và tự triển khai vòng lặp hoạt động cơ bản của một shell.
+- Khởi chạy chương trình bên ngoài và quản lý vòng đời tiến trình con.
+- Kết nối nhiều chương trình bằng pipeline.
+- Hiểu vai trò của FD, `dup2()`, `close()` và EOF trong việc điều khiển luồng dữ liệu.
+- Quan sát và giải thích hành vi hệ thống bằng `strace`.
+
+#### 2. Phạm vi chức năng
+Mini-Shell cần có những chức năng chính:
+* **Command Execution**:
+  - Hiển thị shell prompt và nhận lệnh.
+  - Phân tích command thành tên chương trình và danh sách arguments.
+  - Khởi chạy chương trình bên ngoài.
+  - Chờ tiến trình hoàn thành và xử lý exit status.
+  - Hỗ trợ tìm chương trình thông qua `PATH`.
+* **Built-in Commands**:
+  - `exit`: kết thúc shell.
+  - `cd`: thay đổi working directory của chính shell.
+* **Pipeline**:
+  - Hỗ trợ pipeline cơ bản `cmd1 | cmd2`.
+  - Chuyển stdout của chương trình trước thành stdin của chương trình sau.
+  - Quản lý đúng các đầu pipe và vòng đời FD.
+  - Không giới hạn ở một cặp lệnh nếu việc mở rộng lên nhiều lệnh vẫn nằm trong khả năng của project.
+* **Error Handling**:
+  - Xử lý command không tồn tại.
+  - Xử lý lỗi khi tạo process hoặc pipe.
+  - Đảm bảo tiến trình con không bị bỏ sót và tài nguyên được đóng đúng cách.
+
+#### 3. Giới hạn phạm vi
+Không triển khai:
+- Shell scripting.
+- Job control và background processes (`&`).
+- Shell expansion, globbing, environment variable expansion.
+- Parser hỗ trợ đầy đủ quoting và escaping.
+- Input/output redirection (`<`, `>`, `>>`).
+- Các tính năng nâng cao của Bash.  
+*Ưu tiên một parser đơn giản, đủ phục vụ các chức năng trong phạm vi project.*
+
+#### 4. Các nhóm thiết kế cần giải quyết
+Người học tự quyết định thiết kế và cách triển khai các nhóm sau (không có code mẫu hay hướng dẫn từng bước):
+- **Shell Loop & Command Parsing**: Vòng lặp tương tác và phân tích input.
+- **Process Execution**: Ranh giới giữa shell parent, child process và external program.
+- **Built-in Command Architecture**: Phân biệt lệnh cần chạy trong shell với chương trình bên ngoài.
+- **Pipeline & FD Lifecycle**: Thiết kế luồng dữ liệu, quản lý FD và tránh deadlock.
+- **Process Synchronization & Exit Status**: Thu hồi tiến trình con và xử lý kết quả thực thi.
+- **Error Handling**: Các tình huống thất bại và cách phục hồi.
+
+#### 5. Tiêu chí hoàn thành
+- Có thể chạy các chương trình thông thường từ Mini-Shell.
+- Có thể sử dụng `cd` và `exit` đúng ngữ nghĩa.
+- Có thể chạy pipeline và nhận output chính xác.
+- Không bị treo do quản lý FD sai.
+- Xử lý được các lỗi cơ bản.
+- Có thể dùng `strace` giải thích chuỗi syscall của một lần thực thi lệnh và pipeline.
+
+#### 6. Tài liệu tham khảo (Giới hạn tối đa 3 tài liệu)
+- Linux man-pages — [fork(2)](https://man7.org/linux/man-pages/man2/fork.2.html) và [execve(2)](https://man7.org/linux/man-pages/man2/execve.2.html).
+- Linux man-pages — [pipe(7)](https://man7.org/linux/man-pages/man7/pipe.7.html).
+- Linux man-pages — [dup(2)](https://man7.org/linux/man-pages/man2/dup.2.html).
+
+#### 7. Thời lượng
+- **Tổng thời gian dự kiến**: 10 giờ.
+- Ước lượng dựa trên nền tảng hiện tại của người học: đã thực hành C++, `fork`, `execve`, `waitpid`, `pipe`, `dup2`, `close`, FD inheritance và `strace` trong Phase 0/Phase 1. Không tính thời gian như một người mới tiếp xúc với các cơ chế này.
+
+* **Tiêu chuẩn Exit Gate 1 (7 Giờ Thẩm định độc lập)**:
+  - [ ] **Giải thích**: Trình bày mô hình 3 tầng (FD Table ➔ OFD ➔ Inode) giải thích tại sao quên đóng write-end ở shell parent lại làm treo pipeline con.
+  - [ ] **Code C++**: Tự tay xây dựng và debug Mini-Shell chạy được lệnh đơn, `cd`, `exit` và pipeline `cmd1 | cmd2`.
+  - [ ] **Dự đoán & Đo đạc**: Dùng `strace` giải thích chuỗi syscall của một lần thực thi lệnh đơn và pipeline; quan sát quá trình thu dọn zombie bằng `waitpid()`.
+  - [ ] **Phân tích lỗi**: Giải thích tại sao `cd` bắt buộc phải là builtin command mà không thể là external program.
+
+---
+
+### Project 2: Data-Oriented Micro-Benchmark trong C++ (AoS vs. SoA) (Phase 2)
+* **Cơ chế kiểm chứng**: Chi phí vật lý của việc nhảy con trỏ (Pointer Chasing), độ trễ Cache Line (64 bytes), Spatial Locality và đánh đổi bố cục bộ nhớ AoS vs SoA.
+* **Quy mô triển khai C++**: ~70–80 dòng C++ chuẩn mực.
+* **Nhiệm vụ tự code**:
+  1. Định nghĩa cấu trúc AoS: `struct ParticleAoS { float x, y, z; int id; char payload[32]; }` và SoA: `struct ParticleSoA { vector<float> x, y, z; ... }`.
+  2. Tạo 1 triệu phần tử cho mỗi cấu trúc. Viết vòng lặp tính tổng tọa độ $X$ cho cả 2 cấu trúc.
+  3. Đo thời gian thực thi bằng `std::chrono::high_resolution_clock`, biên dịch với `g++ -O2`.
+* **Break-Check thực nghiệm**:
+  - Tăng kích thước `payload` trong AoS từ 32 bytes lên 128 bytes ➔ Dự đoán thời gian tính toán của AoS sẽ tăng gấp bội dù số phép tính không đổi ➔ Đo bằng `perf stat` kiểm chứng L1-dcache-load-misses tăng vọt.
+* **Tiêu chuẩn Exit Gate 2 (8 Giờ Thẩm định độc lập)**:
+  - [ ] **Giải thích**: Giải thích tại sao SoA nhanh hơn AoS dựa trên cơ chế nạp Cache Line 64B của CPU.
+  - [ ] **Code C++**: Tự tay viết hoặc sửa đổi vòng lặp xử lý dữ liệu và đo đạc thời gian bằng C++.
+  - [ ] **Dự đoán & Đo đạc**: Dùng `perf stat` đo và đọc hiểu các chỉ số `L1-dcache-load-misses`, `instructions`, `cycles`.
+  - [ ] **Phân tích Trade-off**: Trình bày rõ: Khi nào nên giữ AoS (OOP tiện cho dev) và khi nào bắt buộc tái cấu trúc sang SoA (data processing throughput).
+
+---
+
+### Project 3: Framed Protocol & Bounded Worker Queue trong C++ (Phase 3)
+* **Cơ chế kiểm chứng**: Tính toàn vẹn của trạng thái dùng chung (State Invariants), cơ chế Producer-Consumer với Bounded Queue, và Protocol Framing trên dòng byte TCP.
+* **Quy mô triển khai C++**: ~100–120 dòng C++ đa luồng.
+* **Nhiệm vụ tự code**:
+  1. Tự viết lớp `BoundedQueue<std::string>` bằng `std::mutex` và `std::condition_variable` (dung lượng cố định $K=5$, chặn khi đầy, chặn khi rỗng, chống spurious wakeups).
+  2. Tự viết logic Framer (Length-prefixed): Đọc 4 bytes header xác định độ dài gói tin, sau đó đọc đủ payload mới chuyển thành message hoàn chỉnh.
+  3. Khởi chạy 2 worker threads lấy message từ Bounded Queue để xử lý.
+* **Break-Check thực nghiệm**:
+  - Mô phỏng client gửi dồn 2 messages trong 1 gói TCP hoặc gửi tách 1 message thành từng byte lẻ ➔ Kiểm chứng Framer vẫn parse chính xác.
+  - Biên dịch với `-fsanitize=thread` (`TSan`) ➔ Kiểm chứng hàng đợi không có bất kỳ Data Race nào dưới tải cao.
+* **Tiêu chuẩn Exit Gate 3 (12 Giờ Thẩm định độc lập)**:
+  - [ ] **Giải thích**: Trình bày vì sao TCP không bảo đảm ranh giới tin nhắn và tại sao Mutex phải đi kèm Condition Variable.
+  - [ ] **Code C++**: Tự viết hoặc sửa một Bounded Queue chuẩn bằng `std::unique_lock` và predicate loop.
+  - [ ] **Dự đoán & Đo đạc**: Dự đoán số lần blocking của Producer khi Queue đầy; quan sát `TSan` sạch lỗi.
+  - [ ] **Phân tích Deadlock**: Phân tích kịch bản Deadlock khi có 2 mutex bị khóa sai thứ tự (Lock Ordering).
+
+---
+
+### Project 4: Boundary-Isolated Domain & In-Memory Testing trong C++ (Phase 4)
+* **Cơ chế kiểm chứng**: Deep Modules, Information Hiding, Dependency Inversion (Hexagonal Ports & Adapters), và khả năng kiểm thử tất định trong bộ nhớ.
+* **Quy mô triển khai C++**: ~80–100 dòng C++.
+* **Nhiệm vụ tự code**:
+  1. Định nghĩa Interface thuần ảo `IStream` (chứa `read()`, `write()`).
+  2. Triển khai `InMemoryStream : public IStream` (dùng `std::vector<uint8_t>` giả lập dòng byte trong RAM).
+  3. Xây dựng lớp nghiệp vụ `OrderProcessor` chỉ nhận `IStream&` để đọc request và gửi response, hoàn toàn không phụ thuộc vào Socket API hay Network Header.
+  4. Viết bộ Unit Test kiểm thử toàn bộ các kịch bản hợp lệ và bất hợp lệ của `OrderProcessor` chạy 100% trong bộ nhớ.
+* **Break-Check thực nghiệm**:
+  - Thử nghiệm đổi cơ chế lưu trữ hoặc đổi giao thức truyền tải ➔ Chứng minh không phải sửa đổi bất kỳ dòng code nào trong `OrderProcessor`.
+* **Tiêu chuẩn Exit Gate 4 (15 Giờ Thẩm định độc lập)**:
+  - [ ] **Giải thích**: Trình bày nguyên lý Deep Modules và cách Dependency Inversion bảo vệ Core Domain Logic.
+  - [ ] **Code C++**: Tự thiết kế một Interface trừu tượng và cài đặt Mock In-Memory Stream để test.
+  - [ ] **Dự đoán & Đo đạc**: Chứng minh toàn bộ test suite chạy trong < 1 giây vì không có I/O đĩa hay mạng thật.
+  - [ ] **Phân tích Ranh giới**: Chỉ ra các lỗi rò rỉ chi tiết hạ tầng (leaky abstractions) trong các thiết kế Shallow Modules.
+
+---
+
+### Project 5: Resilient Client-Server với Heartbeat & Load Shedding trong C++ (Phase 5)
+* **Cơ chế kiểm chứng**: Phát hiện lỗi mạng (Heartbeat / Timeout), cơ chế tự vệ chống sụp đổ (Backpressure / Load Shedding) và Structured Logging khi gặp sự cố.
+* **Quy mô triển khai C++**: ~120–140 dòng C++.
+* **Nhiệm vụ tự code**:
+  1. Viết server TCP theo dõi `last_seen_timestamp` của client. Nếu quá 3 giây không nhận gói Ping, chuyển trạng thái sang `DISCONNECTED` và thu dọn kết nối.
+  2. Tích hợp chính sách Load Shedding: Khi hàng đợi công việc của server đạt 80% dung lượng, từ chối ngay lập tức các request mới bằng mã lỗi `ERR_OVERLOAD` thay vì tiếp tục nhận.
+  3. Viết client gửi Ping định kỳ và gửi request tải. In structured logs (timestamp, client_id, event, queue_depth).
+* **Break-Check thực nghiệm**:
+  - Đột ngột kill tiến trình client (`kill -9`) ➔ Quan sát server phát hiện timeout sau đúng 3s và dọn dẹp state sạch sẽ.
+  - Bắn 50 requests đồng thời vượt dung lượng ➔ Quan sát server trả về mã từ chối an toàn, không bị crash, không bị nghẽn RAM.
+* **Tiêu chuẩn Exit Gate 5 (15 Giờ Thẩm định Tốt Nghiệp)**:
+  - [ ] **Giải thích**: Trình bày sự khác biệt giữa Failure Detection và Failure Handling; nguyên lý Backpressure tự vệ.
+  - [ ] **Code C++**: Tự viết hoặc sửa cơ chế Timeout State Machine và Load Shedding threshold trong C++.
+  - [ ] **Dự đoán & Đo đạc**: Dự đoán số request bị từ chối khi tải tăng đột biến; kiểm tra log chứng minh server phục hồi.
+  - [ ] **Phân tích Sự cố**: Đóng vai trò Architect giải thích nguyên nhân sập dây chuyền (Cascading Failure) và biện pháp phòng chống (Exponential Backoff + Jitter).
+
+---
+
+<a id="9-bộ-công-cụ-chuẩn--môi-trường-quan-sát-toolchain--diagnostics"></a>
+## 9. Bộ Công Cụ Chuẩn & Môi Trường Quan Sát (Toolchain & Diagnostics)
+
+Mọi công cụ đều phục vụ việc **đo lường, kiểm chứng giả thuyết kiến trúc và chẩn đoán sự cố**:
+
+| Công cụ | Tầng hoạt động | Mục đích sử dụng của System Architect |
 | :--- | :--- | :--- |
-| **[GCC / Clang](GCC_Clang)** | Compiler | Kiểm tra warning, tối ưu hóa, pipeline tạo object file |
-| **[CMake](CMake)** | Build Orchestration | Quản lý compilation units và linking thư viện |
-| **[GDB](GDB)** | Debugger | Kiểm tra memory, step execution, quan sát thread states |
-| **[Valgrind / ASan](Valgrind_ASan)** | Memory Sanitizer | Kiểm tra RAII/Lifetime, phát hiện use-after-free, memory leaks |
-| **[ThreadSanitizer (TSan)](ThreadSanitizer)** | Concurrency Sanitizer | Kiểm tra synchronization invariants, phát hiện data races ngầm |
-| **[strace](strace)** | Syscall Profiler | Quan sát các system calls vượt qua ranh giới User/Kernel |
-| **[perf](perf)** | Hardware Profiler | Đo đạc cache misses, CPU metrics, physical performance |
+| **`strace`** | OS Boundary | Quan sát các system calls vượt qua ranh giới User/Kernel; phát hiện rò rỉ FD và treo blocking I/O. |
+| **`perf`** | Hardware Boundary | Đo đạc L1/L2 Cache misses, IPC và Memory Bandwidth để kiểm chứng quyết định bố cục dữ liệu. |
+| **`ThreadSanitizer (TSan)`** | Concurrency Boundary | Phát hiện Data Race và vi phạm bất biến trạng thái (State Invariants) trong môi trường đa luồng. |
+| **`OpenTelemetry / Mock Telemetry`** | Application & Network | Thu thập Metrics (p99 latency, error rate), Structured Logs và Distributed Tracing để chẩn đoán sự cố. |
+| **`Chaos Scripts (Python/Bash)`** | Fault Injection | Bơm lỗi chủ động (mô phỏng lag mạng, ngắt kết nối đột ngột, quá tải requests) để kiểm chứng khả năng tự phục hồi. |
 
 ---
 
-<a id="8-tiêu-chuẩn-đánh-giá-exit-gates-exit-gate-evaluation-framework"></a>
-## 8. Tiêu Chuẩn Đánh Giá Exit Gates (Exit Gate Evaluation Framework)
-
-Mọi Exit Gate đều đánh giá theo tiêu chuẩn **Pass/Fail** dựa trên 6 tiêu chí:
-
-- [ ] **Knowledge Check**: Giải thích được mental model, lý do tồn tại và hậu quả khi vi phạm.
-- [ ] **Implementation Check**: Xây dựng đồ án đáp ứng đầy đủ tiêu chí nghiệm thu hành vi.
-- [ ] **Break Check**: Chủ động tạo ra lỗi mục tiêu (ví dụ: deadlock, linker error, zombie process).
-- [ ] **Debugging Check**: Dùng toolchain chuẩn để định vị nguyên nhân bằng đo lường, không đoán mò.
-- [ ] **Reasoning Check**: Giải thích nguyên nhân thất bại xuyên suốt các tầng trừu tượng.
-- [ ] **Transfer Check**: Áp dụng nguyên lý vào câu hỏi chuyển giao (Transfer Question) mở rộng.
-
----
-
-<a id="9-định-hướng-chuyên-sâu-specialization-gates"></a>
-## 9. Định Hướng Chuyên Sâu (Specialization Gates)
-
-Sau khi hoàn thành `CORE COMPLETE` (Tháng 18), kỹ sư có nền móng vững chắc để chuyển sang các hướng chuyên sâu:
-
-- [ ] **Game Development (UE5)**: TCP framing & State authority ➔ Game networking, replication, synchronization.
-- [ ] **Backend Engineering**: Concurrency invariants ➔ Transaction isolation, DB consistency, HTTP/gRPC, Rate limiting.
-- [ ] **Cybersecurity**: Boundary testing ➔ Fuzzing, Memory safety, Exploitation mitigation.
-- [ ] **Systems / Low-Level**: Virtual memory & Execution model ➔ Kernel, Drivers, Embedded systems.
-- [ ] **HFT / High-Performance Engineering**: Cache locality & I/O reasoning ➔ Latency engineering, HFT systems.
-- [ ] **Networking**: Socket API ➔ Custom Protocol Engineering, SDN.
-
----
-
-<a id="10-phạm-vi-hoãn-lại-scope-control--exclusions"></a>
-## 10. Phạm Vi Hoãn Lại (Scope Control / Exclusions)
-
-Để tránh phình đại phạm vi (Scope Creep), các chủ đề sau **cố tình KHÔNG nằm trong 18 tháng cốt lõi**:
-- **Advanced Data Structures & Algorithms**: Chỉ cần năng lực thuật toán cơ bản.
-- **Production Databases (PostgreSQL, Redis)**: Hoãn lại tới Backend Specialization (cần tự quản lý state/concurrency trước).
-- **Kubernetes / Cloud Deployments (AWS/GCP)**: Hoãn lại để tránh trừu tượng hóa quá sớm.
-- **Distributed Consensus (Raft/Paxos) & Multi-node**: Hoãn lại; tập trung vào single-server / client-server.
-- **Game Engines (Unreal/Unity)**: Hoãn lại tới Game Dev Specialization.
-- **Offensive Cybersecurity / Exploitation**: Dùng security như lăng kính thiết kế chứ không học thủ thuật hack.
-
----
-
-<a id="11--thẻ-ôn-tập-active-recall-flashcards--self-test-questions"></a>
-## 11. Thẻ Ôn Tập Active Recall (Flashcards & Self-Test Questions)
+<a id="10-thẻ-ôn-tập-năng-lực-kiến-trúc-active-recall-flashcards"></a>
+## 10. Thẻ Ôn Tập Năng Lực Kiến Trúc (Active Recall Flashcards)
 
 <details>
-<summary><b> [Phase 0] RAII và Smart Pointers hoạt động như thế nào?</b></summary>
+<summary><b> [Phase 1] Tại sao Process là ranh giới cô lập lỗi tối thượng trên một node? Cạm bẫy rò rỉ FD qua exec là gì?</b></summary>
 
-- **Khái niệm**: RAII (Resource Acquisition Is Initialization) gắn liền vòng đời tài nguyên với vòng đời đối tượng stack. Khi đối tượng ra khỏi scope, destructor tự động giải phóng tài nguyên.
-- **Con trỏ**:
-  - `std::unique_ptr`: Sở hữu độc quyền (exclusive ownership).
-  - `std::shared_ptr`: Sở hữu chia sẻ (shared ownership via reference counting).
-  - `Raw Pointer / Reference`: Truy cập không sở hữu (non-owning access).
-- **Lỗi tránh được**: Memory leak, double free, use-after-free, dangling pointer.
+- **Cô lập lỗi (Fault Isolation)**: Mỗi Process sở hữu một Không gian Địa chỉ Ảo (VAS) riêng biệt do MMU và Kernel bảo vệ. Lỗi truy cập bộ nhớ (`SIGSEGV`) hoặc crash trong một tiến trình hoàn toàn không thể làm hỏng bộ nhớ của tiến trình khác.
+- **Cạm bẫy rò rỉ FD**: Mặc định POSIX, File Descriptors được kế thừa qua `execve()`. Nếu tiến trình cha mở file chứa thông tin nhạy cảm (token, private key) rồi sinh tiến trình con thực thi mã bên thứ ba mà quên đặt cờ `O_CLOEXEC`, tiến trình con có thể đọc/ghi trực tiếp vào file đó.
 </details>
 
 <details>
-<summary><b> [Phase 1] Phân biệt Program và Process? Sự khác biệt giữa Zombie và Orphan process?</b></summary>
+<summary><b> [Phase 2] Tại sao tối ưu thuật toán O(N) đôi khi không cứu được hiệu năng nếu vi phạm Cache Locality?</b></summary>
 
-- **Program vs Process**: Program là tập hợp bytes tĩnh trên đĩa; Process là ngữ cảnh thực thi động trong bộ nhớ với tài nguyên riêng do OS quản lý.
-- **Zombie Process**: Child process đã kết thúc nhưng Parent process chưa gọi `wait()` / `waitpid()` để thu dọn exit status.
-- **Orphan Process**: Parent process kết thúc trước Child process. Child process sẽ được reparent cho `init` (PID 1) thu dọn.
+- **Mechanical Sympathy**: Truy cập dữ liệu trong L1 Cache mất ~1ns, trong khi truy cập RAM vật lý mất ~50–100ns (chênh lệch hàng chục đến hàng trăm lần).
+- **Hệ quả kiến trúc**: Một thuật toán $O(N)$ nhưng duyệt dữ liệu qua con trỏ ngẫu nhiên (Pointer Chasing trong cây nhị phân hoặc mảng đối tượng lớn AoS) sẽ liên tục gây Cache Misses, khiến CPU phải dừng chờ dữ liệu từ RAM, chậm hơn rất nhiều so với thuật toán xử lý tuần tự trên một mảng liền kề (SoA) tận dụng được Cache Line 64 bytes.
 </details>
 
 <details>
-<summary><b> [Phase 2] Page Fault là gì? Tại sao duyệt mảng 2D theo cột lại chậm hơn theo hàng?</b></summary>
+<summary><b> [Phase 3] Mutex bảo vệ cái gì? Bản chất của Protocol Framing trên TCP là gì?</b></summary>
 
-- **Page Fault**: Là cơ chế phần cứng/OS khi địa chỉ bộ nhớ ảo được truy cập chưa có sẵn trong RAM vật lý. Page fault có thể hoàn toàn bình thường (demand paging) hoặc do truy cập trái phép (dẫn tới `SIGSEGV`).
-- **Duyệt mảng 2D**: Trong C/C++, mảng 2D lưu theo thứ tự hàng (Row-Major Order). Duyệt theo hàng tận dụng được **Spatial Locality** (các phần tử kề nhau nằm chung 1 Cache Line 64-bytes). Duyệt theo cột gây Cache Miss liên tục vì nhảy ô nhớ xa.
+- **Bảo vệ Invariant**: Mutex không phải chỉ bảo vệ một biến; Mutex bảo vệ **Bất biến trạng thái (State Invariant)** — khoảng thời gian dữ liệu rơi vào trạng thái trung gian không hợp lệ.
+- **Protocol Framing**: TCP là một dòng byte liên tục (byte-stream), hoàn toàn không có khái niệm ranh giới gói tin. Một lần gửi (`send`) 100 bytes có thể đến bên nhận (`recv`) thành 20 bytes rồi 80 bytes, hoặc gom chung với gói tin tiếp theo. Ứng dụng bắt buộc phải tự thiết kế Framing (Length-prefixed hoặc Delimiter) để ghép đúng thông điệp logic.
 </details>
 
 <details>
-<summary><b> [Phase 3] Mutex bảo vệ cái gì? Cạm bẫy Partial I/O trong TCP là gì?</b></summary>
+<summary><b> [Phase 4] Phân biệt Deep Module và Shallow Module? Tại sao Dependency Inversion giúp hệ thống dễ test?</b></summary>
 
-- **Mutex**: Mutex không phải chỉ bảo vệ một biến; Mutex bảo vệ **Bất biến trạng thái (State Invariant)** hoặc một giao thức trạng thái dùng chung.
-- **Partial I/O Trap**: TCP là luồng byte không có ranh giới tin nhắn (stream-oriented). Một lệnh `send()` không bảo đảm tương ứng 1 lệnh `recv()`. Ứng dụng phải dùng **Framing** (ví dụ: length-prefixed protocol) để gom đuôi byte hoàn chỉnh trước khi xử lý.
+- **Deep vs Shallow Modules**: Deep Module có giao diện đơn giản nhưng che giấu hiện thực mạnh mẽ bên trong, giúp giảm gánh nặng nhận thức và hạn chế thay đổi lan truyền (Change Amplification). Shallow Module có giao diện cồng kềnh nhưng ruột rỗng, làm lộ chi tiết nội bộ ra ngoài.
+- **Dependency Inversion & Testability**: Khi Core Domain chỉ phụ thuộc vào Interfaces trừu tượng (Ports) chứ không phụ thuộc vào Sockets hay Database (Adapters), ta có thể dễ dàng thay thế Socket thật bằng một In-Memory Mock Stream. Toàn bộ logic nghiệp vụ có thể được kiểm thử 100% trong vài giây mà không cần dựng mạng hay cài database thật.
 </details>
 
 <details>
-<summary><b> [Phase 4] Phân biệt Dependency Inversion Principle và Dependency Injection?</b></summary>
+<summary><b> [Phase 5] Khác biệt cốt tử giữa Failure Detection và Failure Handling? Tại sao Backpressure cứu mạng hệ thống?</b></summary>
 
-- **Dependency Inversion**: Là nguyên lý kiến trúc — Module cấp cao không phụ thuộc vào Module cấp thấp; cả hai phụ thuộc vào Trừu tượng (Abstraction).
-- **Dependency Injection**: Là một kỹ thuật triển khai (implementation technique) để cung cấp dependency từ bên ngoài vào thay vì tự khởi tạo bên trong.
-</details>
-
-<details>
-<summary><b> [Phase 5] Khác biệt giữa Failure Detection và Failure Handling? Backpressure là gì?</b></summary>
-
-- **Failure Detection vs Handling**: Detection (Timeout, Heartbeat, Reset) phát hiện sự cố; Handling (Cleanup, Releasing State) xử lý dọn dẹp tài nguyên. Hai quá trình này phải đồng bộ hóa để tránh race condition.
-- **Backpressure**: Là phản ứng của hệ thống khi tốc độ tới > tốc độ xử lý. Các chính sách xử lý bao gồm: Bounded queues, Reject mới, Throttle nguồn gửi, Drop gói tin ưu tiên thấp.
+- **Detection vs Handling**: Phát hiện lỗi (Timeout, Heartbeat) chỉ là nhận biết một thành phần không phản hồi; Xử lý lỗi (Cleanup state, Retry, Failover) là quyết định hành động. Phản ứng quá nhanh mà không có cơ chế Exponential Backoff + Jitter sẽ tạo ra bão yêu cầu (Thundering Herd), đánh sập toàn bộ các node còn lại.
+- **Backpressure**: Khi tốc độ gửi vượt quá tốc độ xử lý, nếu không có cơ chế chặn hoặc loại bỏ tải (Drop/Reject), hàng đợi vô hạn sẽ bão hòa RAM, gây ra Page Thrashing hoặc kích hoạt OOM Killer làm sập toàn bộ dịch vụ. Backpressure là cơ chế tự vệ: thà từ chối một phần request có kiểm soát còn hơn để toàn bộ hệ thống sụp đổ.
 </details>
 
 ---
+
+> **Cam Kết Kỷ Luật**: Toàn bộ nội dung trên là kim chỉ nam chính thức, khóa chặt hạn chót hoàn thành trước ngày **01/02/2027**. Mọi hoạt động học tập hàng tuần đều phải bám sát ngân sách giờ và tiêu chí nghiệm thu của từng Phase.
