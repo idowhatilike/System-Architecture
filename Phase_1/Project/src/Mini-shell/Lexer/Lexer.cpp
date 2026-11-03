@@ -1,23 +1,38 @@
 #include "Lexer.hpp"
 #include <vector>
 
-void tokenizeWord(const string& cur_word,vector <Token>& result,const int& inQuotes){
+#include "Lexer.hpp"
+#include <vector>
+
+void tokenizeWord(const string& cur_word , vector<Token>& result , const int& inQuotes){
     if (cur_word.empty() && !inQuotes) return;
     if (!inQuotes){
         if (cur_word == ";"){
-            result.push_back({TOKEN_TYPE::SEQUENCE, cur_word});
+            result.push_back({SEQUENCE , cur_word});
             return;
         }
         if (cur_word == "|"){
-            result.push_back({TOKEN_TYPE::PIPE, cur_word});
+            result.push_back({PIPE , cur_word});
             return;
         }
         if (cur_word == "&&"){
-            result.push_back({TOKEN_TYPE::AND, cur_word});
+            result.push_back({AND , cur_word});
+            return;
+        }
+        if (cur_word == ">"){
+            result.push_back({RD_OUT , cur_word});
+            return;
+        }
+        if (cur_word == "<"){
+            result.push_back({RD_IN , cur_word});
+            return;
+        }
+        if (cur_word == ">>"){
+            result.push_back({RD_APP , cur_word});
             return;
         }
     }
-    result.push_back({TOKEN_TYPE::WORD, cur_word});
+    result.push_back({WORD , cur_word});
 }
 
 bool splitLine(const string& Line , vector <Token>& result){
@@ -40,7 +55,14 @@ bool splitLine(const string& Line , vector <Token>& result){
             cur_word.clear();
             continue;
         }
-        if (Line[i] == '|' || Line[i] == ';'){
+        if (i + 1 < int(Line.size()) && Line[i] == '>' && Line[i + 1] == '>'){
+            tokenizeWord(cur_word , result , inQuotes);
+            cur_word = ">>"; i ++;
+            tokenizeWord(cur_word , result , inQuotes);
+            cur_word.clear();
+            continue;
+        }
+        if (Line[i] == '|' || Line[i] == ';' || Line[i] == '>' || Line[i] == '<'){
             tokenizeWord(cur_word , result , inQuotes);
             cur_word = Line[i];
             tokenizeWord(cur_word , result , inQuotes);

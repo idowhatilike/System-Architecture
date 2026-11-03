@@ -10,28 +10,23 @@
 #include <stdio.h>
 #include <sstream>
 #include <vector>
+#include <fcntl.h>
 
 using std::cin;
 using std::cout;
 using std::cerr;
 using std::getline;
-using std::string;
-using std::stringstream;
-using std::vector;
 using std::getenv;
 
-using Command = vector <string>;
-using PipeLine = vector <Command>;
-using AndChain = vector <PipeLine>;
-using Program = vector <AndChain>;
+
 
 constexpr int MAX_PATH_LENGTH = PATH_MAX;
 
 const char* home_env = getenv("HOME");
 const string home_path = home_env ? home_env : "";
 
-constexpr int IN = STDIN_FILENO;
-constexpr int OUT = STDOUT_FILENO;
+constexpr int INFD = STDIN_FILENO;
+constexpr int OUTFD = STDOUT_FILENO;
 
 extern char** environ;
 
@@ -53,20 +48,29 @@ string external[] = {
     "mkdir" 
 };
 
-vector <string> history_list;
+simpleCmd history_list;
 
 char cwd[MAX_PATH_LENGTH];
 string current_path , previous_path , dst_path;
 string line;
 vector <Token> result;
-Program list;
+Program cmds;
+int saved_in , saved_out;
 
 #define endl '\n'
 #define updatePath {previous_path = current_path , current_path = getCwd();}
-#define ERR1 {cerr << "Error: Too many arguments" << endl; return 1;}
-#define ERR2 {cerr << "Error: No such file or directory" << endl; return 1;}
-#define ERR3 {cerr << "Error: HOME environment variable not set" << endl; return 1;}
-#define ERR4 {cerr << "Arguments is not valid" << endl; return 1;}
+#define ERR1 {cerr << "Error: Too many arguments" << endl; restoreFd(); return 1;}
+#define ERR2 {cerr << "Error: No such file or directory" << endl; restoreFd(); return 1;}
+#define ERR3 {cerr << "Error: HOME environment variable not set" << endl; restoreFd(); return 1;}
+#define ERR4 {cerr << "Arguments is not valid" << endl; restoreFd(); return 1;}
+
+//restore fd in/out after redirection
+void restoreFd(){
+    dup2(saved_in , INFD);
+    dup2(saved_out , OUTFD);
+    close(saved_in);
+    close(saved_out);
+}
 
 //get current path without leak memory
 string getCwd(){
@@ -81,31 +85,41 @@ bool readLine(){
     return static_cast<bool>(getline(cin , line));
 }
 
-//devide cmd to group : ";" -> "&&"" -> "|"
-void parse(const vector <Token>& token,Program& list){
-    list.clear();
+//devide cmd to group : ";" -> "&&"" -> "|" -> ">>" -> ">" & "<"
+void parse(const vector <Token>& token,Program& cmds){
+    cmds.clear();
     AndChain cur_AndChain;
     PipeLine cur_PipeLine;
     Command cur_Command;
     string value;
+    auto curRedirect = NONE;
     for (const Token& i : token){
-        const auto t = i.type;
+        const auto type = i.type;
         value = i.value;
-        if (t == TOKEN_TYPE::WORD){
-            cur_Command.push_back(value);
+        if (type == WORD){
+            if (curRedirect == NONE) cur_Command.args.push_back(value);
+            else {
+                cur_Command.reds.push_back({curRedirect , value});
+                curRedirect = NONE;
+            }
             continue;
         } 
-        if (t == TOKEN_TYPE::PIPE){
-            if (cur_Command.size()){
+        if (curRedirect != NONE) return void(cerr << "Arguments is not valid" << endl);
+        if (type == RD_IN || type == RD_OUT || type == RD_APP){
+            curRedirect = (type == RD_IN ? IN : (type == RD_OUT ? OUT : APP));
+            continue;
+        }
+        if (type == PIPE){
+            if (non_empty(cur_Command)){
                 cur_PipeLine.push_back(cur_Command);
-                cur_Command.clear();
+                _clear(cur_Command);
             }
             continue;
         }
-        if (t == TOKEN_TYPE::AND){
-            if (cur_Command.size()){
+        if (type == AND){
+            if (non_empty(cur_Command)){
                 cur_PipeLine.push_back(cur_Command);
-                cur_Command.clear();
+                _clear(cur_Command);
             }
             if (cur_PipeLine.size()){
                 cur_AndChain.push_back(cur_PipeLine);
@@ -113,15 +127,28 @@ void parse(const vector <Token>& token,Program& list){
             }
             continue;
         }
-        if (cur_Command.size()) cur_PipeLine.push_back(cur_Command);
-    if (cur_PipeLine.size()) cur_AndChain.push_back(cur_PipeLine);
+        if (non_empty(cur_Command)){
+            cur_PipeLine.push_back(cur_Command);
+            _clear(cur_Command);
+        }
+        if (cur_PipeLine.size()){
+            cur_AndChain.push_back(cur_PipeLine);
+            cur_PipeLine.clear();
+        }
         if (cur_AndChain.empty()) continue;
-        list.push_back(cur_AndChain);
+        cmds.push_back(cur_AndChain);
         cur_AndChain.clear();
     }
-    if (cur_Command.size()) cur_PipeLine.push_back(cur_Command);
-    if (cur_PipeLine.size()) cur_AndChain.push_back(cur_PipeLine);
-    if (cur_AndChain.size()) list.push_back(cur_AndChain);
+    if (non_empty(cur_Command)){
+        cur_PipeLine.push_back(cur_Command);
+        _clear(cur_Command);
+    }
+    if (cur_PipeLine.size()){
+        cur_AndChain.push_back(cur_PipeLine);
+        cur_PipeLine.clear();
+    }
+    cmds.push_back(cur_AndChain);
+    cur_AndChain.clear();
 }
 
 void history(){
@@ -177,20 +204,53 @@ void unsetenv(const string& name) {
     if (::unsetenv(name.c_str()) == -1) perror("unsetenv");
 }
 
-void echo(const Command& cmd) {
-    for (size_t i = 1; i < cmd.size(); ++i) {
+void echo(const simpleCmd& list) {
+    for (size_t i = 1 ; i < list.size() ; i ++) {
         if (i > 1) cout << ' ';
-        cout << cmd[i];
+        cout << list[i];
     }
     cout << '\n';
 }
 
-int isExternalCmd(const Command& list){
-    for (string st : external) if (list[0] == st) return 1;
+int isBuiltin(const simpleCmd& list){
+    for (auto st : builtin) if (list[0] == st) return 1;
     return 0;
 }
 
-int BuiltInCmd(const Command& list){
+int isExternalCmd(const simpleCmd& list){
+    return !isBuiltin(list);
+}
+
+void reDirection(const vector <Redirect>& reds){
+    int fd , Option;
+    string filename;
+    for (const Redirect& i : reds){
+        const auto type = i.type;
+        filename = i.filename;
+        Option = (type == OUT) ? O_TRUNC : O_APPEND;
+        if (type == IN){
+            if ((fd = open(filename.c_str() , O_RDONLY)) == -1){
+                perror(filename.c_str());
+                return;
+            }
+            dup2(fd , INFD);
+            if (fd != INFD) close(fd);
+            continue;
+        }
+        if ((fd = open(filename.c_str() , O_WRONLY | O_CREAT | Option , 0644)) == -1){
+            perror(filename.c_str());
+            return;
+        }
+        dup2(fd , OUTFD);
+        if (fd != OUTFD) close(fd);
+    }
+}
+
+int BuiltInCmd(const Command& cmd){
+    simpleCmd list = cmd.args;
+    saved_in = dup(INFD) , saved_out = dup(OUTFD);
+    reDirection(cmd.reds);
+
     if (list[0] == "cd"){
         dst_path.clear();
         if (list.size() > 2) ERR1;
@@ -222,22 +282,24 @@ int BuiltInCmd(const Command& list){
     if (list[0] == "echo") echo(list);
     if (list[0] == "history") history();
     if (list[0] == "pwd") pwd();
+    restoreFd();
     return 0;
 }
 
 vector <pid_t> vChild;
-int ExternalCmd(const Command& list,const int& in,const int& out){
+int notSignleBuiltInCmd(const Command& cmd,const int& in,const int& out){
+    simpleCmd list = cmd.args;
     vector <char*> ptr;
     pid_t child = fork();
+
     if (child < 0) return 1;
     if (child == 0){
-        dup2(in , STDIN_FILENO);
-        dup2(out , STDOUT_FILENO);
-        if (in != IN) close(in); 
-        if (out != OUT) close(out);
-        vChild.push_back(getpid());
-
-        if (!isExternalCmd(list)) BuiltInCmd(list);
+        dup2(in , INFD);
+        dup2(out , OUTFD);
+        if (in != INFD) close(in); 
+        if (out != OUTFD) close(out);
+        reDirection(cmd.reds);
+        if (!isExternalCmd(list)) BuiltInCmd(cmd);
         else {
             if (!isExternalCmd(list)){
                 cerr << "Error : Unknow command\n";
@@ -252,19 +314,19 @@ int ExternalCmd(const Command& list,const int& in,const int& out){
             perror("execvp");
             _exit(127);
         }
-    }   
+    } else vChild.push_back(child);
     return 0;
 }
 
-void solve(const Program& list){
+void solve(const Program& cmds){
     int num_cmd , fdin , fdout , status;
-    for (const AndChain& chain : list){
+    for (const AndChain& Achain : cmds){
         int PREV_STATUS = 0;
-        for (const PipeLine& line : chain){
+        for (const PipeLine& line : Achain){
             num_cmd = (int)line.size();
             if (num_cmd == 1){
-                if (!isExternalCmd(line[0])) PREV_STATUS = BuiltInCmd(line[0]);
-                else PREV_STATUS = ExternalCmd(line[0], IN, OUT);
+                if (!isExternalCmd(line[0].args)) PREV_STATUS = BuiltInCmd(line[0]);
+                else PREV_STATUS = notSignleBuiltInCmd(line[0] , INFD , OUTFD);
             }
             else {
                 vector <vector <int>> pf(num_cmd - 1 , vector <int> (2));
@@ -277,16 +339,16 @@ void solve(const Program& list){
                 }
                 if (PREV_STATUS) break;
                 for (int i = 0 ; i < num_cmd && !PREV_STATUS ; i ++){
-                    fdin = !i ? IN : pf[i - 1][0];
-                    fdout = i + 1 < num_cmd ? pf[i][1] : OUT;
-                    PREV_STATUS = ExternalCmd(line[i] , fdin , fdout);
-                }
-                while (vChild.size()){
-                    waitpid(vChild.back() , &status , 0);
-                    vChild.pop_back();
-                    if (!WIFEXITED(status)) PREV_STATUS = 1;
+                    fdin = !i ? INFD : pf[i - 1][0];
+                    fdout = i + 1 < num_cmd ? pf[i][1] : OUTFD;
+                    PREV_STATUS = notSignleBuiltInCmd(line[i] , fdin , fdout);
                 }
                 for (int i = 0 ; i < num_cmd - 1 ; i ++) close(pf[i][0]) , close(pf[i][1]);
+            }
+            while (vChild.size()){
+                waitpid(vChild.back() , &status , 0);
+                vChild.pop_back();
+                if (!WIFEXITED(status)) PREV_STATUS = 1;
             }
             if (PREV_STATUS) break;
         }
@@ -297,9 +359,9 @@ int main(){
     current_path = getCwd();
     while (readLine()){
         splitLine(line , result);
-        parse(result , list);
-        if (list.size() != 1 || list[0].size() != 1 
-            || list[0][0].size() != 1 || list[0][0][0][0] != "history") history_list.push_back(line);
-        solve(list);
+        parse(result , cmds);
+        if (cmds.size() != 1 || cmds[0].size() != 1  || cmds[0][0].size() != 1 
+        || cmds[0][0][0].args[0] != "history") history_list.push_back(line);
+        solve(cmds);
     }
 }
