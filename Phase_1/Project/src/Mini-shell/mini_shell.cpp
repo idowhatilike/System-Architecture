@@ -11,14 +11,15 @@
 #include <sstream>
 #include <vector>
 #include <fcntl.h>
+#include <csignal>
+#include <array>
+#include <string_view>
 
 using std::cin;
 using std::cout;
 using std::cerr;
 using std::getline;
 using std::getenv;
-
-
 
 constexpr int MAX_PATH_LENGTH = PATH_MAX;
 
@@ -28,9 +29,13 @@ const string home_path = home_env ? home_env : "";
 constexpr int INFD = STDIN_FILENO;
 constexpr int OUTFD = STDOUT_FILENO;
 
+constexpr const char* COLOR_GREEN = "\033[1;32m";
+constexpr const char* COLOR_ORANGE = "\033[1;33m";
+constexpr const char* COLOR_RESET  = "\033[0m";
+
 extern char** environ;
 
-string builtin[] = {
+constexpr std::array<std::string_view, 9> builtin = {
     "cd",
     "help",
     "exit",
@@ -38,7 +43,8 @@ string builtin[] = {
     "setenv",
     "unsetenv",
     "history",
-    "echo"
+    "echo",
+    "clear"
 };
 
 string external[] = {
@@ -48,6 +54,9 @@ string external[] = {
     "mkdir" 
 };
 
+volatile std::sig_atomic_t end;
+volatile std::sig_atomic_t sig;
+
 simpleCmd history_list;
 
 char cwd[MAX_PATH_LENGTH];
@@ -56,13 +65,6 @@ string line;
 vector <Token> result;
 Program cmds;
 int saved_in , saved_out;
-
-#define endl '\n'
-#define updatePath {previous_path = current_path , current_path = getCwd();}
-#define ERR1 {cerr << "Error: Too many arguments" << endl; restoreFd(); return 1;}
-#define ERR2 {cerr << "Error: No such file or directory" << endl; restoreFd(); return 1;}
-#define ERR3 {cerr << "Error: HOME environment variable not set" << endl; restoreFd(); return 1;}
-#define ERR4 {cerr << "Arguments is not valid" << endl; restoreFd(); return 1;}
 
 //restore fd in/out after redirection
 void restoreFd(){
@@ -79,10 +81,37 @@ string getCwd(){
     return result;
 }
 
+inline void updatePath(){
+    previous_path = current_path;
+    current_path = getCwd();
+}
+
+inline int reportError(std::string_view msg){
+    cerr << msg << '\n';
+    restoreFd();
+    return 1;
+}
+
+void mini_shell_path(){
+    string user_host = "chisikudo";
+    cout << COLOR_GREEN << user_host << COLOR_RESET;
+    cout << " : " << COLOR_ORANGE << current_path << COLOR_RESET;
+    cout << "$> ";
+}
+
 //read line of command
 bool readLine(){
-    cout << "mini-shell-chihihihi :3 Giỡn chisikudo> " << std::flush;
-    return static_cast<bool>(getline(cin , line));
+    sig = 0;
+    mini_shell_path();
+    if (!getline(cin , line)){
+        if (cin.eof() && !sig){
+            cout << "Goodbye homie !\n";
+            return false;
+        }
+        cin.clear(); line.clear();
+        end = 0;
+    }
+    return 1;
 }
 
 //devide cmd to group : ";" -> "&&"" -> "|" -> ">>" -> ">" & "<"
@@ -104,7 +133,10 @@ void parse(const vector <Token>& token,Program& cmds){
             }
             continue;
         } 
-        if (curRedirect != NONE) return void(cerr << "Arguments is not valid" << endl);
+        if (curRedirect != NONE) {
+            cerr << "Arguments is not valid\n";
+            return;
+        }
         if (type == RD_IN || type == RD_OUT || type == RD_APP){
             curRedirect = (type == RD_IN ? IN : (type == RD_OUT ? OUT : APP));
             continue;
@@ -193,7 +225,7 @@ void printenv(){
 }
 
 void pwd(){
-    cout << current_path << endl;
+    cout << current_path << '\n';
 }
 
 void setenv(const string& name, const string& value){
@@ -253,18 +285,18 @@ int BuiltInCmd(const Command& cmd){
 
     if (list[0] == "cd"){
         dst_path.clear();
-        if (list.size() > 2) ERR1;
+        if (list.size() > 2) return reportError("Error: Too many arguments");
         if (list.size() == 1 || list[1] == "$HOME" || list[1] == "~"){
-            if (getenv("HOME") == nullptr) ERR3;
+            if (getenv("HOME") == nullptr) return reportError("Error: HOME environment variable not set");
             dst_path = getenv("HOME"); 
-            if (!dst_path.empty() && !chdir(dst_path.c_str())) updatePath
-            else ERR3;
+            if (!dst_path.empty() && !chdir(dst_path.c_str())) updatePath();
+            else return reportError("Error: HOME environment variable not set");
         }
         else {
             if (list[1] == "-") dst_path = previous_path;
             else dst_path = list[1]; 
-            if (!dst_path.empty() && !chdir(dst_path.c_str())) updatePath
-            else ERR2;
+            if (!dst_path.empty() && !chdir(dst_path.c_str())) updatePath();
+            else return reportError("Error: No such file or directory");
         }
         return 0;
     }
@@ -272,16 +304,17 @@ int BuiltInCmd(const Command& cmd){
     if (list[0] == "exit") exit(0);
     if (list[0] == "printenv") printenv();
     if (list[0] == "setenv"){
-        if (list.size() != 3) ERR4;
+        if (list.size() != 3) return reportError("Arguments is not valid");
         setenv(list[1] , list[2]); 
     }
     if (list[0] == "unsetenv"){
-        if (list.size() != 2) ERR4;
+        if (list.size() != 2) return reportError("Arguments is not valid");
         unsetenv(list[1]);
     }
     if (list[0] == "echo") echo(list);
     if (list[0] == "history") history();
     if (list[0] == "pwd") pwd();
+    if (list[0] == "clear") cout << "\033[2J\033[1;1H";
     restoreFd();
     return 0;
 }
@@ -299,9 +332,9 @@ int notSignleBuiltInCmd(const Command& cmd,const int& in,const int& out){
         if (in != INFD) close(in); 
         if (out != OUTFD) close(out);
         reDirection(cmd.reds);
-        if (!isExternalCmd(list)) BuiltInCmd(cmd);
+        if (isBuiltin(list)) BuiltInCmd(cmd);
         else {
-            if (!isExternalCmd(list)){
+            if (isBuiltin(list)){
                 cerr << "Error : Unknow command\n";
                 return 0;
             }
@@ -314,18 +347,21 @@ int notSignleBuiltInCmd(const Command& cmd,const int& in,const int& out){
             perror("execvp");
             _exit(127);
         }
+        _exit(0);
     } else vChild.push_back(child);
     return 0;
 }
 
 void solve(const Program& cmds){
+    end = 0;
     int num_cmd , fdin , fdout , status;
     for (const AndChain& Achain : cmds){
         int PREV_STATUS = 0;
         for (const PipeLine& line : Achain){
+            if (end) break;
             num_cmd = (int)line.size();
             if (num_cmd == 1){
-                if (!isExternalCmd(line[0].args)) PREV_STATUS = BuiltInCmd(line[0]);
+                if (isBuiltin(line[0].args)) PREV_STATUS = BuiltInCmd(line[0]);
                 else PREV_STATUS = notSignleBuiltInCmd(line[0] , INFD , OUTFD);
             }
             else {
@@ -348,16 +384,43 @@ void solve(const Program& cmds){
             while (vChild.size()){
                 waitpid(vChild.back() , &status , 0);
                 vChild.pop_back();
+                if (WIFSIGNALED(status) && WTERMSIG(status) == SIGINT) end = 1;
                 if (!WIFEXITED(status)) PREV_STATUS = 1;
             }
-            if (PREV_STATUS) break;
+            if (PREV_STATUS || end) break;
         }
+    }
+}
+
+void signalHandler(int signum){
+    sig = signum;
+    switch(signum){
+        case SIGINT : 
+            cout << '\n';
+            end = 1;
+            cout << "\n[Reze] Kết thúc bằng builtin exit nhé !\n";
+            break;
+        case SIGTSTP :
+            cout << "\n[Baka] Nhấn lộn signal rồi bylat\n";
+            break;
+        default :
+            cout << "\n[Handler] Tín hiệu lạ : " << signum << '\n';
+            break;
     }
 }
 
 int main(){
     current_path = getCwd();
+    struct sigaction sa{};
+    sigaction(SIGINT , nullptr , &sa);
+    sigaction(SIGTSTP , nullptr , &sa);
+    sigemptyset(&sa.sa_mask);
+    sa.sa_handler = signalHandler;
+    sa.sa_flags &= ~SA_RESTART;
+    sigaction(SIGINT ,  &sa , nullptr);
+    sigaction(SIGTSTP , &sa , nullptr);
     while (readLine()){
+        if (line.empty() || line.find_first_not_of(" \t") == string::npos) continue;
         splitLine(line , result);
         parse(result , cmds);
         if (cmds.size() != 1 || cmds[0].size() != 1  || cmds[0][0].size() != 1 

@@ -50,6 +50,11 @@ bool splitLine(const string& Line , vector <Token>& result){
             cur_word += Line[i];
             continue;
         }
+        if (Line[i] == '#'){
+            tokenizeWord(cur_word , result , inQuotes);
+            cur_word.clear();
+            break;
+        }
         if (Line[i] == ' '){
             tokenizeWord(cur_word , result , inQuotes);
             cur_word.clear();
