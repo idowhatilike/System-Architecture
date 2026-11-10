@@ -2,7 +2,7 @@
 
 _______________________________________________________________________________
 
-# Day 001 : **Hệ thống phân cấp bộ nhớ**
+# **Hệ thống phân cấp bộ nhớ**
 
 ____________________________________________________________
 
@@ -114,3 +114,42 @@ Dung lượng = (Số bit / sector) * (Số sectors trung bình / track) * (Số
 - Ví dụ : SRAM nhanh hơn DRAM chút ; DRAM nhanh hơn ổ đĩa rất nhiều ; nhưng chi phí thì ngược lại
 Bạn có thể xem hình 6.15 trong CS:APP để theo dõi 1 bảng số liệu (không chính thức)
 - Những xu hướng thay đổi dài hạn làm nổi bật 1 điều : Tăng mật độ lưu trữ giảm chi phí dễ thực hiện hơn nhiều so với giảm thời gian truy cập và hiệu năng ổ đĩa và DRAM đang tụt hậu so với CPU . Trước khi multi-core (đa nhân) thì khoảng cách do latency-DRAM và disk truy cập dữ liệu chậm hơn CPU , sau khi có đa nhân khoảng cách còn nới rộng do throughput (đa nhân cùng gửi truy vấn) . Giải pháp là dùng SRAM-based cache để thu hẹp 
+
+____________________________________________________________
+
+## II / Tính cục bộ (Locality)
+- Một chương trình có thiết kế tốt có tính cục bộ cao (tức truy cập phần tử gần phần tử vừa truy cập) . Xu hướng này gọi là nguyên lý tính cục bộ (principle of locality) . Được chia thành 2 loại :
++ Cục bộ theo thời gian : Một bộ nhớ sau khi truy cập sẽ được truy cập nhiều lần trong tương lai gần
++ Cục bộ theo không gian : Truy cập đến bộ nhớ gần bộ nhớ đã truy cập ngay trước đó
+- *Note* : Thay vì tăng tốc độ xung nhịp thứ vốn tiêu thụ quá nhiều điện năng (giới hạn công suất) thì bước tiến công nghệ đầu thế kỷ 21 là thay thế 1 bộ xử lý đơn lớn = nhiều lõi xử lý nhỏ (P = f * C * V^2) trong đó : f = xung nhịp , C điện dung và V điện áp (Định luật Moore tốc độ tăng tiến hàm mũ)
+
+### 1. Tính cục bộ của các tham chiếu (Dữ liệu chương trình)
+- Mẫu truy cập bước k = truy cập cách đều mỗi k phần tử
+- Mẫu truy cập bước 1 còn gọi là truy cập tuần tự
+Ví dụ : Nếu có mảng a(M,N) , truy cập (1->M)(1->N) (k = 1) tốt hơn (1->N)(1->M) (k = N)
+
+### 2. Tính cục bộ theo lệnh nạp (Locality of Instruction Fetches)
+- Vì các lệnh chương trình được lưu trong bộ nhớ và phải được CPU nạp để thực thi nên ta có thể đánh giá tính cục bộ của chương trình dựa trên việc nạp . Một điểm quan trọng là mã lệnh khác với dữ liệu chương trình là hiếm khi bị thay đổi 
+
+### 3. Tổng kết 
+- Giới thiệu sơ bộ và 1 số đặc tính như : 
++ Các chương trình lặp đi lặp lại 1 biến -> Tốt về thời gian cục bộ
++ Các chương trình với mẫu truy cập bước càng nhỏ -> Tốt về không gian cục bộ
++ Các vòng lặp có tính cục bộ tốt theo thời gian , không gian có lợi cho việc nạp lệnh . Phần thân vòng lặp càng nhỏ , số lần lặp lại càng nhiều thì tính cục bộ càng tốt
+
+____________________________________________________________
+
+## III / Hệ thống phân cấp bộ nhớ (The memory hierarchy)
+- Sự bổ trợ cho nhau giữa phần cứng/mền tạo ra 1 pp tổ chức các hệ thống bộ nhớ (memory hierarchy)
+
+### 1. Cơ chế lưu đệm trong hệ thống phân cấp bộ nhớ
+- Nhìn chung là thiết bị lưu trữ nhỏ , tốc độ cao , là vùng lưu trữ trung gian cho các đối tượng dữ liệu lớn nhưng chậm hơn . Ý tưởng cốt lõi : Cấp k đóng vai trò cache cho thiết bị cấp k + 1 . Ví dụ : Ổ đĩa là bộ nhớ đệm cho các tệp từ các ổ đĩa server ; bộ nhớ chính ... ổ đỉa ; ... ; thanh ghi cpu . Vì vậy các cấp bộ nhớ càng xa CPU thường sử dụng block có kích thước lớn để giảm ảnh hưởng thời gian truy cập dài hơn (1 lần đi 5MB = 5 lần đi , mỗi lần 1 MB)
+- *_Cache Hit_* : Khi cần một đối tượng dữ liệu d từ tầng k + 1 , nếu đối tượng nằm ở cấp k thì có thể đọc trực tiếp , ta gọi là cache hit
+- *_Cache Miss_* : Ngược lại , cache ở cấp k sẽ lấy dữ liệu từ cấp k + 1 , nếu đã đầy phải ghi đề lên 1 block đang được lưu tại đó (block bị thay thế hoặc loại bỏ được gọi là victim block) . Block bị thay thế dựa trên chính sách 
+- Các loại Cache Miss : cold miss (khi cache cấp k rỗng) -> linh hoạt nhưng tốn kém : mọi block cấp k + 1 lưu vào -> block bất kỳ cấp k hoặc : giới hạn vị trí lưu của mỗi block cấp k + 1 vào 1 tập con nhỏ cấp k . Các chương trình thường trải qua nhiều giai đoạn , mỗi giai đoạn truy cập đến 1 tập block cache tương đổi ổn định , được gọi là working set của tập đó 
+- Quản lý Cache : Mỗi cấp cần cơ chế quản lý gồm : chia vùng lưu trữ thành các block ; truyền các block giữa các cấp ; xác định cache hit và cache miss (đồng thời xử lý) được triển khai bằng phần cứng , mềm hoặc cả 2
+
+### 2. Tổng kết 
+- Dựa trên 2 yếu tố : Chương trình có tính cục bộ ; Bộ nhớ có tốc độ truy vấn nhanh có chi phí cao hơn
+- Khai thác tính cục bộ thời gian : Nhờ vào tính lặp đi lặp lại và lần ghi vào cache đầu tiên
+- Khai thác tính cục bộ không gian : Kỳ vọng chi phí sao chép cache miss bù đắp ở cách lần truy cập
