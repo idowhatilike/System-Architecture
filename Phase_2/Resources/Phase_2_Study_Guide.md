@@ -223,106 +223,24 @@ Dành **10 giờ** để tự tay viết 3 chương trình C++ nhỏ, biên dị
 
 ### Lab 2.1: Đo lường Truy Cập Tuần Tự vs Bước Nhảy Ngẫu Nhiên (`stride_benchmark.cpp`)
 * **Cơ chế cần hiểu**: Spatial Locality và Cache Line 64B. Một Cache Line nạp được 16 số nguyên 4-byte (`sizeof(int) = 4`). Nếu duyệt với bước nhảy (Stride) = 1, cứ 16 phần tử mới bị 1 Cache Miss. Nếu bước nhảy Stride = 16 (nhảy 64 bytes), **mỗi phần tử duyệt qua đều dính 1 Cache Miss mới!**
-* **Tự triển khai bằng C++ (`Phase_2/src/lab2_stride.cpp`)**:
-  ```cpp
-  #include <iostream>
-  #include <vector>
-  #include <chrono>
-
-  const size_t ARRAY_SIZE = 64 * 1024 * 1024; // 64 triệu int (~256 MB, vượt xa L3 Cache)
-
-  void run_stride(const std::vector<int>& arr, size_t stride) {
-      long long sum = 0;
-      auto start = std::chrono::high_resolution_clock::now();
-      
-      // Duyệt mảng theo bước nhảy stride
-      for (size_t i = 0; i < arr.size(); i += stride) {
-          sum += arr[i];
-      }
-      
-      auto end = std::chrono::high_resolution_clock::now();
-      std::chrono::duration<double, std::milli> elapsed = end - start;
-      std::cout << "Stride: " << stride << " | Time: " << elapsed.count() << " ms | Sum: " << sum << std::endl;
-  }
-
-  int main(int argc, char* argv[]) {
-      size_t stride = (argc > 1) ? std::stoull(argv[1]) : 1;
-      std::vector<int> data(ARRAY_SIZE, 1);
-      run_stride(data, stride);
-      return 0;
-  }
-  ```
 * **Quan sát / Đo đạc bằng công cụ**:
-  Biên dịch với `-O2`:
+  Chạy từ `Phase_2/build` (đã bật `-O2`):
   ```bash
-  g++ -O2 Phase_2/src/lab2_stride.cpp -o lab2_stride
-  perf stat -e L1-dcache-load-misses,cycles,instructions ./lab2_stride 1
-  perf stat -e L1-dcache-load-misses,cycles,instructions ./lab2_stride 16
+  cmake ..
+  cmake --build . --target perf_stride_1
+  cmake --build . --target perf_stride_16
   ```
 * **Tiêu chí xác nhận**: So sánh kết quả `perf stat`: Khi chạy với `stride 16`, số lượng `L1-dcache-load-misses` tăng vọt và thời gian thực thi trên mỗi phần tử tăng gấp nhiều lần so với `stride 1`.
 
 ---
 
-### Lab 2.2: So Sánh Bố Cục Dữ Liệu AoS vs SoA trong C++ (`lab2_aos_vs_soa.cpp`)
+### Lab 2.2: So Sánh Bố Cục Dữ Liệu AoS vs SoA trong C++ (`Aos&SoA.cpp`)
 * **Cơ chế cần hiểu**: Cấu trúc AoS làm loãng Cache Line khi chỉ tính toán trên 1 trường dữ liệu. SoA tối đa hóa mật độ dữ liệu hữu ích trong Cache Line.
-* **Tự triển khai bằng C++ (`Phase_2/src/lab2_aos_vs_soa.cpp`)**:
-  ```cpp
-  #include <iostream>
-  #include <vector>
-  #include <chrono>
-
-  const size_t NUM_PARTICLES = 5'000'000;
-
-  // Mô hình AoS (OOP)
-  struct ParticleAoS {
-      float x, y, z;
-      int id;
-      char tag[32]; // Dữ liệu phụ làm phình kích thước lên 48 bytes
-  };
-
-  // Mô hình SoA (Data-Oriented)
-  struct ParticleSoA {
-      std::vector<float> x;
-      std::vector<float> y;
-      std::vector<float> z;
-      std::vector<int> id;
-  };
-
-  int main() {
-      // 1. Benchmark AoS
-      std::vector<ParticleAoS> aos(NUM_PARTICLES);
-      for (size_t i = 0; i < NUM_PARTICLES; ++i) aos[i].x = 1.0f;
-
-      auto start_aos = std::chrono::high_resolution_clock::now();
-      float sum_aos = 0;
-      for (size_t i = 0; i < NUM_PARTICLES; ++i) {
-          sum_aos += aos[i].x;
-      }
-      auto end_aos = std::chrono::high_resolution_clock::now();
-      std::chrono::duration<double, std::milli> aos_time = end_aos - start_aos;
-
-      // 2. Benchmark SoA
-      ParticleSoA soa;
-      soa.x.resize(NUM_PARTICLES, 1.0f);
-
-      auto start_soa = std::chrono::high_resolution_clock::now();
-      float sum_soa = 0;
-      for (size_t i = 0; i < NUM_PARTICLES; ++i) {
-          sum_soa += soa.x[i];
-      }
-      auto end_soa = std::chrono::high_resolution_clock::now();
-      std::chrono::duration<double, std::milli> soa_time = end_soa - start_soa;
-
-      std::cout << "AoS Time: " << aos_time.count() << " ms (Sum: " << sum_aos << ")" << std::endl;
-      std::cout << "SoA Time: " << soa_time.count() << " ms (Sum: " << sum_soa << ")" << std::endl;
-      std::cout << "Throughput Tăng: " << (aos_time.count() / soa_time.count()) << "x" << std::endl;
-      return 0;
-  }
-  ```
 * **Quan sát / Đo đạc bằng công cụ**:
+  Chạy từ `Phase_2/build` (đã bật `-O2`):
   ```bash
-  g++ -O2 Phase_2/src/lab2_aos_vs_soa.cpp -o lab2_aos_vs_soa
-  perf stat -e L1-dcache-load-misses,cycles ./lab2_aos_vs_soa
+  cmake ..
+  cmake --build . --target perf_aos_vs_soa
   ```
 * **Tiêu chí xác nhận**: SoA chạy nhanh hơn ít nhất **2x – 4x** so với AoS dù cùng số phép cộng số thực `float`, và `perf stat` chỉ ra AoS tạo ra nhiều cache misses hơn đáng kể.
 
@@ -330,31 +248,11 @@ Dành **10 giờ** để tự tay viết 3 chương trình C++ nhỏ, biên dị
 
 ### Lab 2.3: Quan Sát Page Faults & Working Set
 * **Cơ chế cần hiểu**: Khác biệt giữa Minor Page Fault (cấp phát trang mới trong RAM) và Major Page Fault.
-* **Tự triển khai bằng C++ (`Phase_2/src/lab2_page_fault.cpp`)**:
-  ```cpp
-  #include <iostream>
-  #include <vector>
-  #include <cstring>
-
-  int main() {
-      const size_t SIZE = 100 * 1024 * 1024; // 100 MB
-      std::cout << "Cấp phát 100 MB bộ nhớ..." << std::endl;
-      char* mem = new char[SIZE];
-
-      std::cout << "Bắt đầu chạm vào từng trang 4KB để kích hoạt Demand Paging..." << std::endl;
-      for (size_t i = 0; i < SIZE; i += 4096) {
-          mem[i] = 'A'; // Kích hoạt 1 Minor Page Fault cho mỗi trang 4KB
-      }
-      
-      delete[] mem;
-      return 0;
-  }
-  ```
 * **Quan sát / Đo đạc bằng công cụ**:
-  Sử dụng lệnh `/usr/bin/time -v`:
+  Chạy từ `Phase_2/build` bằng `/usr/bin/time -v`:
   ```bash
-  g++ -O2 Phase_2/src/lab2_page_fault.cpp -o lab2_page_fault
-  /usr/bin/time -v ./lab2_page_fault
+  cmake ..
+  cmake --build . --target time_page_fault
   ```
 * **Tiêu chí xác nhận**: Trong output của `/usr/bin/time -v`:
   - `Minor (reclaiming a frame) page faults`: xấp xỉ $\approx 25.600$ lần ($100 \text{ MB} / 4 \text{ KB} = 25.600$).

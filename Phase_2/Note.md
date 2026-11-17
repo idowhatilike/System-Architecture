@@ -153,3 +153,102 @@ ____________________________________________________________
 - Dựa trên 2 yếu tố : Chương trình có tính cục bộ ; Bộ nhớ có tốc độ truy vấn nhanh có chi phí cao hơn
 - Khai thác tính cục bộ thời gian : Nhờ vào tính lặp đi lặp lại và lần ghi vào cache đầu tiên
 - Khai thác tính cục bộ không gian : Kỳ vọng chi phí sao chép cache miss bù đắp ở cách lần truy cập
+
+____________________________________________________________
+
+## IV / Bộ nhớ đệm (Cache Memories)
+
+- Ban đầu thì chỉ có 3 cấp bộ nhớ : Thanh ghi CPU ; Bộ nhớ ; Bộ lưu trữ đĩa . Nhưng khoảng cách hiệu năng CPU và bộ nhớ chính , nsx bổ sung bộ nhớ đệm SRAM nhỏ gọi là L1 Cache
+
+### 1. Cấu trúc tổng quan bộ nhớ đệm
+- Xét 1 hệ thống máy tính mỗi địa chỉ có m bit (M = 2^m địa chỉ khác nhau) . Cache được tổ chức :
++ cache = mảng S = 2^s set ; 
++ set = E cache line ; 
++ cache line : 1 valid bit ; t (= m - b + s) bits tag được lấy 1 phần từ địa chỉ bộ nhớ của block ; b byte data (B = 2^b) (t bits tag là địa chỉ trong bộ nhớ chính và dùng trong việc đối chiếu block data)
+-> Ta sẽ dùng (S,E,B,m) = cache struct và dung lượng là : C = S * E * B 
+- Vậy làm thế nào để cache biết cache hit hay miss :
++ Chia địa chỉ m bit thành : t bits (Tag) + s bits (Set Id) + b bits (Block offset)
++ Đầu tiên nó truy cập vào St = set[Set Id] ; Nếu trong St có line sao cho t bits tag = Tag và valid bit = 1 -> line trong set chứa data cần tìm và vị trí qua Block offset
+
+### 2. Cache ánh xạ trực tiếp (DR-Mapped Cache)
+- Cache được phân loại dựa trên số lượng cache line (E) và set có E = 1 gọi là direct-mapped cache
+- Quá trình cache xác định một yêu cầu miss hay hit có 3 bước : 
++ Set selection -> Line matching -> Word extraction (ta sẽ dùng quy trình trong DMC cho đơn giản nhất)
+- Set selection : Đơn giản là lấy s bit index phần giữa địa chỉ rồi truy cập vào set đó
+- Line matching : Valid bit = 1 và Tag trong cache line trùng với Tag rút ra được từ đầu địa chỉ
+- Word selection : Nếu hit ở Line matching , ta dùng offset xác định vị trí (1 block = n bytes)
+- Line replacement : Khi miss , truy vấn dữ liệu từ cache thấp hơn và thay thế cache line tương ứng
+
+### 3. Conflict miss 
+- Conflict miss thường xuyên xảy ra và gây ra vấn đề hiệu năng khó lý giải . Ví dụ DMC và size = 2^n thì truy cập mảng , ví dụ dot product 2 mảng n = 8 (Sum(x[i] * y[i])) , vì liên tục cache miss và thay thế block (x0 -> x4 ; y0 -> y4 = set0 cứ lặp đi lặp lại 2 block này - giả sử block chứa được 4 giá trị)
+*Note* : Lý do tại sao dùng các bit giữa thay vì đầu là giúp nó trải đều chỉ số các block ra thay vì tụ lại và giữ nguyên id block giữa các byte trong block
+
+### 4. Liên kết theo tập (Set associative cache)
+- Conflict miss trong DMC bắt nguồn từ việc E = 1 . SAS nới lỏng cho set chứa nhiều cache line hơn (E > 1 ; và E < C / B thường gọi là liên kết hợp E đường - E way SAS)
+- Line matching & Word selection : Nah nothing , 1 lý thuyết mà dùng
+- Line replacement : Khi miss , trích dữ liệu và thế vào : line chưa set valid bit (nếu có) ; ngược lại thì may rủi :> mong là thế cái line vô dụng , và policy rất rất phức tạp
+
+### 5. 1 set duy nhất (E = C/B)
+### 6. Các vấn đề khi ghi dữ liệu 
+- Thao tác write phức tạp hơn read 1 tý . Nếu miss cơ bản ta sẽ cập nhật ở tầng dưới và cập nhật line replacement như read nhưng khi hit , sau khi cập nhật bản sao của w trong cache hiện tại ta cần xử lý ở tầng dưới . Đơn giản nhất là cập nhật trực tiếp xuống , gọi là write-through , nhưng như thế tạo ra số lượng truyền trên bus rất lớn , ta có thể dùng "write-back" (chỉ ghi khi block đó bị loại ở cache) nhưng phải thêm dirty bit để biết bị sửa chưa . Còn với xử lý write-miss : 
++ write-allocate : nạp block tương ứng lên rồi cập nhật trong bản sao đó nhầm tận dụng spatial locality (cbkg) nhưng cần truyền block lên mỗi write-miss
++ no-write-allocate : ghi thông thường xuống dưới 
+- Ta có 2 trường phái : 
++ write-through + no-write-allocate hoặc + write-back + write-allocate (ưu tiên cho pro hehe)
+
+### 7. Cấu trúc của 1 hệ thống phân cấp cache thực tế
+### 8. Ảnh hưởng các thông số của cache đến hiệu năng 
+- Được đánh giá qua vài chỉ số
+- Miss rate = (Số lần miss) / (Số lần truy cập) và Hit rate = 1 - Miss_rate
+- Hit time : Thời gian đưa 1 word có trong cache vào CPU 
+- Miss penalty : Thời gian phát sinh thêm khi miss 1 lần
+- Ảnh hưởng dung lượng cache : càng lớn hit rate càng lớn , hit time càng nhỏ
+- Ảnh hưởng kích thước block : Tăng hit rate , nhưng khi ta cố định dung lượng cache thì ít cache line -> làm giảm hit rate ? và tăng miss penalty (trade-off của quỷ)
+- Ảnh hưởng liên kết (tạm xét E) : giảm thrashing do conflict miss nhưng khi E cao thì đpt tăng thì hit time và miss penalty tăng
+- Ảnh hưởng chiến lược ghi : Càng đi xuống thấp càng chuộng write-back
+
+
+_____________________________________________________________________________________________
+
+
+# **PAGING : PHÂN TRANG**
+
+______________________________________________________________________________________________
+
+## I / Introduction 
+- MMU — bộ quản lý bộ nhớ , PTE là Page Table Entry - 1 phần tử của PT (không nhất thiết phải là PT[0])
+- Bảng Trang (Page Table) được lưu ở đâu ? Vì bản thân bảng trang lớn và nếu nhiều tiến trình thì sẽ là
+một lượng tài nguyên vô cùng , giả sử mỗi trang được lưu trong bộ nhớ chính (RAM)
+- Bảng trang là ánh xạ VPN -> PFN . Dạng đơn giản nhất là linear page table - bảng tuyến tính : 
++ valid bit - cho biết ánh xạ có hợp lệ không , không thì trap (và os thường kết liễu tiến trình)
++ protection bits - các bit cho biết quyền được đọc , ghi , thực thi (nếu truy cập sai thì cũng sẽ gọi trap)
++ ngoài ra còn : present bit ; dirty bit ; reference bit (theo dõi trang được cập nhật chưa) ; ...
+- Phân trang vẫn quá chậm ? Vì lưu trong RAM (DRAM) làm chậm tốc độ . Để từ VPN -> PFN . Cơ bản là muốn đọc từ bộ nhớ vật lý cần địa chỉ gồm : PFN + offset (lấy từ vpn_mask) , mà PFN thì cần id (liên quan đến ptbr , vpn và size(pte))
+
+## II / Faster Translations (TLBs)
+- Tăng tốc dịch địa chỉ bằng phần cứng tên là Translation-lookaside buffer - TLB (thuộc MMU)
+- Về bản chất là cache phần cứng lưu ánh xạ địa chỉ ảo sang bộ nhớ vật lý thường được sử dụng 
+- Thuật toán cơ bản : Tạo 1 cache với mong muốn TLB hit nhiều bằng sự tối ưu tính cục bộ
+- Xử lý TLB Miss : Có hai khả năng - Phần cứng (hardware) hoặc Phần mền (OS)
++ Phần cứng : nhóm CISC (Complex Instruction Set Computer - tập các lệnh phức tạp của máy tính) . Khi đó phần cứng cần biết : Page Table nằm ở đâu trong bộ nhớ (PTBR) ; Cấu trúc của PT . Khi gặp TLB miss , phần cứng chỉ cần dò theo cấu trúc và tìm đúng entry lấy thông tin - gọi là page-table walk
++ Phần mềm : Các hệ thống ra đời muộn (ví dụ : MIPS R10k thuộc RISC (Reduced Instruction Set Computer — máy tính có tập lệnh rút gọn)) . Khi TLB miss , phần cứng sinh expection gọi trap và xử lý . Có 2 điểm cần lưu ý : Ta thực hiện tiếp lệnh gây TLB miss chứ không bỏ qua như systemcall thông thường ; TrapHandler trong trường hợp này không được gây ra chuỗi TLB miss vô hạn (có thể giải quyết bằng nhiều cách như 1 số mã truy cập trực tiếp ; dùng wired translations - ánh xạ cố định)
+- Những gì được chứa trong TLB : 1 TLB điển hình có thể có 32 , 64 hoặc 128 entry (theo kiểu fully associative) : VPN + PFN + Các bit bổ sung (valid bit ; protections bíts ; dirty bit ; ....)
+- Context Switch : VPN <-> PFN của mỗi tiến trình là khác biệt . Nội dung TLB xử lý như nào khi context switch ? Cách đơn giản nhất là : flush TLB (TLB thành rỗng) (nếu do OS đảm nhiệm thì dùng lệnh đặc quyền ; hoặc đổi thanh ghi địa chỉ cơ sở PTBR - thứ vốn đổi khi ctx switch làm đổi sang không gian địa chỉ khác) - sau đó set valid bits = 0 . Để giảm chi phí , 1 số hệ thống bổ sung phần cứng giữ lại ánh xạ của nhiều tiến trình trong TLB qua các lần ctx switch , thường là address-space identifier — ASID (mã định danh vào không gian địa chỉ mở)
+- Thay thế : Có nhiều Policy về việc nên thay thế entry nào (giống như mọi cache thông thường) . Phổ biến như LRU - loại bỏ entry lâu chưa sử dụng hay random 
+- Culler's Law : RAM không phải lúc nào cũng là RAM
+- Và ta sẽ nguyên cứu cách truy cập cache = địa chỉ ảo 
+- https://fanout.sh/labs/latency-numbers
+
+- P18 bài tập :
+1. Tăng lên ; Giảm đi ; Gây lãng phí tài nguyên (cấp phát Page ; Chiếm dụng ; Lãng phí PM ; Load lâu)
+2. PTEs = Size(Adr) / Size(PT) ; ... 
+- P19 bài tập :
+Lab : 
+- Chênh lệch không lớn như trong lab
+- Bench_mark : thuần (chỉ cách biệt rõ rệt khi N lớn) và khi cho extra_data -> 128 thời gian thì SoA tăng nhiều hơn là AoS (dù vẫn nhỏ hơn 2 lần) -> AoS rất bất định trong số đo
+
+Phần 7 lab :
+Lab 1 : Số lượng cache miss gần như là như nhau , còn về loaded miss tức là phần không dùng thì đúng , gấp gần 16 lần do phí 15 phần tử mà 
+Lab 2 : Không tới 2-4x , N càng lớn thì càng hiệu quả nhưng đo N=10^5-10^6 thì 1.1-1.4x 
+Lab 3 : Không có thao tác đọc từ đĩa mà chỉ có ghi vào trang vật lý đã ghi
+Phần 8 thì : AoS đo giữa các lần lệch khá lớn và khi dùng cách upd nguyên 1 obj hay upd lần lượt từng thuộc tính của obj sẽ có lợi AoS hay SoA chỉ thực sự có chênh lệch lớn khi N lớn . Còn việc thêm data thì có thể hiểu như việc SoA nó tách cái struct ra thành các phần riêng , và có vài cái không dùng thì không quan tâm , còn SoA tức là tạo ra 1 obj thực sự hoàn chỉnh mà compile không tối ưu được , nếu như cả 2 đều dùng thì sẽ khác
