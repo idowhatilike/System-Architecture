@@ -7,4 +7,4 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 add_executable(run src/project2_benchmark.cpp)
-target_compile_options(run PRIVATE -O3 -mavx2)
+target_compile_options(run -O3 -mavx2)
